@@ -1,0 +1,84 @@
+$borderSmall: 10px;
+$borderMedium: 15px;
+
+.rounded-small {
+    border-radius: $borderSmall;
+}
+
+.rounded-medium {
+    border-radius: $borderMedium;
+}
+
+@mixin space($kind, $size) {
+    .#{$kind}space-#{$size} {
+        @if $kind == "v" {
+            height: $size + px;
+        } @else {
+            width: $size + px;
+        }
+    }
+}
+
+@mixin spaces {
+    @each $kind in "v", "h" {
+        @for $i from 1 through 10 {
+            @include space($kind, $i * 5);
+        }
+    }
+}
+
+@mixin gap($size) {
+    .gap-#{$size} {
+        gap: $size + px;
+    }
+}
+
+@mixin gaps {
+    @for $i from 1 through 10 {
+        @include gap($i * 5);
+    }
+}
+
+@mixin margin-single($kind, $size, $type) {
+    $property: if($type == "p", "padding", "margin");
+    $prefix: if($type == "p", "p", "m");
+
+    .#{$prefix}#{$kind}-#{$size} {
+        @if $kind == "v" {
+            #{$property}-top: $size + px;
+            #{$property}-bottom: $size + px;
+        } @else if $kind == "h" {
+            #{$property}-left: $size + px;
+            #{$property}-right: $size + px;
+        }
+    }
+}
+
+@mixin margin-uniform($size, $type) {
+    $property: if($type == "p", "padding", "margin");
+    $prefix: if($type == "p", "p", "m");
+
+    .#{$prefix}-#{$size} {
+        #{$property}: $size + px;
+    }
+}
+
+@mixin margins {
+    @each $type in "p", "m" {
+        @for $i from 0 through 10 {
+            @include margin-uniform($i * 5, $type);
+        }
+
+        @each $kind in "v", "h" {
+            @for $i from 0 through 10 {
+                @include margin-single($kind, $i * 5, $type);
+            }
+        }
+    }
+}
+
+
+
+@include spaces;
+@include gaps;
+@include margins;

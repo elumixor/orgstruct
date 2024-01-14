@@ -1,0 +1,67 @@
+@use "@styles/colors.scss";
+@use "@styles/fonts.scss";
+@use "@styles/layout.scss";
+
+@use "@styles/elements/button.scss";
+
+html {
+    background-color: #eee;
+    font-family: fonts.$main;
+    color: colors.$grey;
+}
+
+body {
+    padding: 0;
+    margin: 0;
+}
+
+
+.italic {
+    font-style: italic;
+}
+
+.bold {
+    font-weight: bold;
+}
+
+.light {
+    font-weight: lighter;
+}
+
+.flex {
+    display: flex;
+
+    &-column {
+        display: flex;
+        flex-direction: column;
+    }
+
+    &-row {
+        display: flex;
+        flex-direction: row;
+    }
+}
+
+.inline-flex {
+    display: inline-flex;
+}
+
+.block {
+    display: block;
+}
+
+.inline-block {
+    display: inline-block;
+}
+
+.fixed {
+    position: fixed;
+}
+
+.relative {
+    position: relative;
+}
+
+.absolute {
+    position: absolute;
+}

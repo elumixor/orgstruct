@@ -1,0 +1,11 @@
+@use "@styles/colors.scss";
+
+path {
+    stroke: colors.$grey;
+    stroke-width: 2px;
+    // fill: none;
+}
+
+.element {
+    fill: colors.$grey;
+}

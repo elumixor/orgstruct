@@ -1,0 +1,30 @@
+$grey: #292929;
+$light-grey: lighten($grey, 70%);
+$white: #eee;
+
+$admin: #FFB800;
+$construction: #D0682E;
+$distribution: #CC2A8B;
+$finance: #DA3939;
+$tech: #8340DA;
+$qa: #4B8D4E;
+$pr: #449586;
+
+$danger: #b3082d;
+$action: #007bac;
+
+.bg-white {
+    background-color: $white;
+}
+
+.bg-grey {
+    background-color: $grey;
+}
+
+.fg-white {
+    color: $white;
+}
+
+.fg-grey {
+    color: $grey;
+}

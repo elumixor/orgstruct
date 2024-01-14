@@ -1,0 +1,24 @@
+// .block {
+//     width: 1000px;
+//     display: inline-block;
+// }
+
+// .block {
+//     display: inline-block;
+//     position: relative;
+//     width: 100%;
+// }
+
+.container {
+    min-width: 1000px;
+    transition: all 0.1s ease-in-out;
+
+    &:hover {
+        background-color: rgba(121, 79, 41, 0.25);
+        border-radius: 10px;
+    }
+}
+
+.title {
+    font-size: 1.2em;
+}

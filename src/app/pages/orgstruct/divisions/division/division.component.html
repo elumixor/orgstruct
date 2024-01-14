@@ -1,0 +1,18 @@
+<div class="container flex-column gap-5 p-10 m-5" [appContextMenu]="contextMenuDivision">
+    <p class="title mv-0 mh-10 bold italic">{{division.title}} division</p>
+    <div class="flex-row gap-10">
+        @if (division.offices.length > 0) {
+            @for (officeId of division.offices; track $index) {
+                <!-- TODO: Make this a component to avoid duplicate conversions -->
+                <app-block [appContextMenu]="contextMenuOffice(getOffice(officeId))">Office {{getOffice(officeId).title}}</app-block>
+            }
+        } @else {
+            <button (click)="addOffice()">Add Office</button>
+        }
+        </div>
+    <app-block>
+        <p class="bold italic gap-10 flex m-0">
+            <span>FVP:</span><span>{{division.product}}</span>
+        </p>
+    </app-block>
+</div>

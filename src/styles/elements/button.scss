@@ -1,0 +1,39 @@
+@use "@styles/colors.scss";
+@use "@styles/layout.scss";
+
+button {
+    --bg-color: #{colors.$action};
+    --fg-color: #{colors.$white};
+
+    background-color: var(--bg-color);
+
+    border-radius: layout.$borderSmall;
+    border: none;
+    outline: none;
+
+    color: var(--fg-color);
+
+    cursor: pointer;
+
+    font-size: 1rem;
+
+    padding: 0.5rem 1rem;
+    transition: all 0.2s ease-in-out;
+
+    box-shadow: 0 2px 3px var(--bg-color);
+
+    &:hover {
+        // filter: brightness(120%);
+        background-color: color-mix(in srgb, var(--bg-color) 70%, white 30%);
+        box-shadow: 0 3px 5px var(--bg-color);
+    }
+
+    &:active {
+        background-color: color-mix(in srgb, var(--bg-color) 50%, white 50%);
+        transform: scale(0.9);
+    }
+
+    &:focus {
+        outline: none;
+    }
+}

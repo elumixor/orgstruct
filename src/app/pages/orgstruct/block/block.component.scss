@@ -1,0 +1,48 @@
+@use "@styles/colors.scss" as colors;
+
+:host {
+    display: inline-flex;
+    flex-direction: column;
+    align-items: stretch;
+    justify-content: flex-start;
+
+    flex-grow: 1;
+
+    $pv: 10px;
+    $ph: 15px;
+    // width: calc(100% - #{$ph * 2});
+    // height: calc(100% - #{$pv * 2});
+    // position: absolute;
+    padding: $pv $ph;
+
+    border-radius: 10px;
+    background-color: colors.$grey;
+    color: colors.$white;
+    box-shadow: 2px 2px 2px rgba(0, 0, 0, 0.25);
+
+    &:hover {
+        opacity: 0.8;
+    }
+
+    transition: all 0.2s ease-in-out;
+}
+
+// .resizer {
+//     background-color: colors.$grey;
+//     width: 10px;
+//     height: 10px;
+//     border-radius: 50%;
+//     border: 2px solid colors.$white;
+//     bottom: 0;
+//     right: 0;
+//     position: absolute;
+//     transform: translate(50%, 50%);
+
+//     opacity: 0;
+//     transition: opacity 0.1s linear;
+//     cursor: nwse-resize;
+
+//     &.visible {
+//         opacity: 1;
+//     }
+// }

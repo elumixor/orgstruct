@@ -1,0 +1,20 @@
+.content {
+    width: 100%;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.content-container {
+    $pad-h: 15px;
+    width: calc(100% - #{$pad-h * 2});
+    max-width: 500px;
+
+    padding-left: $pad-h;
+    padding-right: $pad-h;
+
+    align-items: stretch;
+    display: flex;
+    flex-direction: column;
+}

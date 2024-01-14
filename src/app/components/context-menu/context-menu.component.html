@@ -1,0 +1,7 @@
+<ng-content></ng-content>
+
+<div class="context-menu fixed fg-white" [style.left]="left" [style.top]="top" [class.visible]="visible">
+    @for (option of options; track $index) {
+        <div class="option p-10" (pointerdown)="selectOption(option)">{{option.text}}</div>
+    }
+</div>

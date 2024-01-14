@@ -1,0 +1,29 @@
+@use "@styles/colors.scss";
+
+.context-menu {
+    &:not(.visible) {
+        opacity: 0;
+        transition: opacity 0.1s ease-out;
+    }
+
+    opacity: 1;
+
+    transition: opacity 0.2s ease-out;
+
+    box-shadow: 4px 4px 5px rgba(0, 0, 0, 0.5);
+
+    border-radius: 5px;
+    overflow: hidden;
+}
+
+.option {
+    background-color: darken(colors.$grey, 50%);
+
+    cursor: pointer;
+
+    &:hover {
+        background-color: lighten(colors.$grey, 20%);
+    }
+
+    transition: all 0.1s ease-in;
+}
