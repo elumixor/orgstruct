@@ -1,4 +1,4 @@
-import { DB } from "./db";
+import { DB } from "./db/db";
 import { server } from "./server";
 
 const port = process.env["PORT"] || 4000;

@@ -1,8 +1,8 @@
+import { fileURLToPath } from "node:url";
+import { dirname, join, resolve } from "node:path";
 import { APP_BASE_HREF } from "@angular/common";
 import { CommonEngine } from "@angular/ssr";
 import express from "express";
-import { fileURLToPath } from "node:url";
-import { dirname, join, resolve } from "node:path";
 import bootstrap from "../src/main.server";
 
 export interface ServerHandler {
@@ -31,7 +31,7 @@ export function server(...handlers: ServerHandler[]) {
         "*.*",
         express.static(browserDistFolder, {
             maxAge: "1y",
-        })
+        }),
     );
 
     // All regular routes use the Angular engine

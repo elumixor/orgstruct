@@ -8,3 +8,4 @@ export * from "./item-type";
 export * from "./person";
 export * from "./position";
 export * from "./task";
+export * from "./producer";

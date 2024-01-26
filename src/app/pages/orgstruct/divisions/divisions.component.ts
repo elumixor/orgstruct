@@ -1,8 +1,8 @@
 import { Component, computed } from "@angular/core";
-import { DivisionComponent } from "./division/division.component";
 import { NetworkService } from "@services";
 import { DBEntry } from "@utils";
 import { IDivision } from "@domain";
+import { DivisionComponent } from "./division/division.component";
 
 @Component({
     selector: "app-divisions",

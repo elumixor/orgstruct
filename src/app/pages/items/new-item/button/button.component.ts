@@ -48,7 +48,7 @@ export class NewItemButtonComponent {
 
     create(type: ItemType) {
         // const db = useContext(DBContext);
-        this.network.createDefault(type);
+        this.network.create(type);
         console.log("creating " + type);
         // console.log(db);
         // await db?.create(type);

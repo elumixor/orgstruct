@@ -1,11 +1,11 @@
 import { Component, Input } from "@angular/core";
-import { NetworkService } from "../../services/network.service";
-import { ItemComponent } from "./item/item/item.component";
-import { NewItemButtonComponent } from "./new-item/button/button.component";
 import { CenteredContentComponent, SearchBarComponent } from "@components";
 import { ItemObject, ItemType, itemsPlural } from "@domain";
 import { search } from "fast-fuzzy";
 import { DBEntry } from "@utils";
+import { NetworkService } from "../../services/network.service";
+import { NewItemButtonComponent } from "./new-item/button/button.component";
+import { ItemComponent } from "./item/item/item.component";
 
 @Component({
     selector: "app-items",

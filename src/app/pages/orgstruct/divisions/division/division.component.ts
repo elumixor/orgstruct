@@ -1,14 +1,16 @@
 import { Component, Input } from "@angular/core";
-import { BlockComponent } from "../../block/block.component";
-import { IDivision, IOffice } from "@domain";
+import { IDivision } from "@domain";
 import { DBEntry } from "@utils";
 import { NetworkService } from "@services";
-import { ContextMenuDirective, IContextMenuOption } from "@components";
+import { ContextMenuDirective, EditableComponent, IContextMenuOption } from "@components";
+import { BlockComponent } from "../../block/block.component";
+import { OfficeComponent } from "../office/office.component";
+import { FVPComponent } from "../fvp/fvp.component";
 
 @Component({
     selector: "app-division",
     standalone: true,
-    imports: [BlockComponent, ContextMenuDirective],
+    imports: [BlockComponent, OfficeComponent, ContextMenuDirective, FVPComponent, EditableComponent],
     templateUrl: "./division.component.html",
     styleUrl: "./division.component.scss",
 })
@@ -20,24 +22,37 @@ export class DivisionComponent {
             text: "Delete division",
             action: () => this.network.remove(this.division),
         },
+        {
+            text: "Add office",
+            action: () => this.addOffice(),
+        },
     ];
 
     constructor(protected readonly network: NetworkService) {}
 
-    addOffice() {
-        this.network.createDefault("office", { divisionId: this.division.id });
+    get title() {
+        return this.division.title;
     }
 
-    contextMenuOffice(office: DBEntry<IOffice>): IContextMenuOption[] {
-        return [
-            {
-                text: "Delete office",
-                action: () => this.network.remove(office),
-            },
-        ];
+    set title(value) {
+        this.division.title = value;
+        this.network.update(this.division, { title: value });
+    }
+
+    get product() {
+        return this.division.product;
+    }
+
+    set product(value) {
+        this.division.product = value;
+        this.network.update(this.division, { product: value });
+    }
+
+    addOffice() {
+        this.network.create("office", { divisionId: this.division.id });
     }
 
     getOffice(officeId: number) {
-        return this.network.data().find(({ id }) => id === officeId) as DBEntry<IOffice>;
+        return this.network.get<"office">(officeId);
     }
 }

@@ -1,9 +1,10 @@
 import { Component } from "@angular/core";
+import { ContextMenuDirective } from "@components";
+import { IContextMenuOption } from "@components/context-menu/context-menu-option";
+import { NetworkService } from "@services";
 import { BlockComponent } from "./block/block.component";
 import { ConnectorComponent } from "./connector/connector.component";
 import { DivisionsComponent } from "./divisions/divisions.component";
-import { ContextMenuDirective } from "@components";
-import { IContextMenuOption } from "@components/context-menu/context-menu-option";
 
 @Component({
     selector: "app-orgstruct",
@@ -13,6 +14,13 @@ import { IContextMenuOption } from "@components/context-menu/context-menu-option
     styleUrl: "./orgstruct.component.scss",
 })
 export class OrgstructComponent {
+    readonly contextMenuOptions: IContextMenuOption[] = [
+        {
+            text: "Add division",
+            action: () => this.network.create("division"),
+        },
+    ];
+
     protected _x = 0;
     protected _y = 0;
     protected scale = 1;
@@ -20,12 +28,7 @@ export class OrgstructComponent {
     protected lastX = 0;
     protected lastY = 0;
 
-    readonly contextMenuOptions: IContextMenuOption[] = [
-        {
-            text: "Add division",
-            action: () => console.log("TODO: Add division!"),
-        },
-    ];
+    constructor(protected network: NetworkService) {}
 
     get transform() {
         return `scale(${this.scale})`;

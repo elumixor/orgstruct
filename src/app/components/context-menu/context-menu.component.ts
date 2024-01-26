@@ -14,6 +14,9 @@ export class ContextMenuComponent {
 
     @ViewChild("containerRef") protected readonly containerRef?: ElementRef<HTMLDivElement>;
 
+    protected _x = 0;
+    protected _y = 0;
+
     constructor() {
         afterNextRender(() => {
             // Register click outside the context menu to close it
@@ -23,9 +26,6 @@ export class ContextMenuComponent {
             });
         });
     }
-
-    protected _x = 0;
-    protected _y = 0;
 
     get left() {
         return `${this._x}px`;

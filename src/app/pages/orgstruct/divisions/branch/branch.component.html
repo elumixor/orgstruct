@@ -1,1 +1,14 @@
-<p>branch works!</p>
+<app-block [appContextMenu]="contextMenu" class="container">
+    <!-- <p class="text-center mv-5">{{branch.title}}</p> -->
+    <div class="flex justify-center bold italic text-center">
+        <app-editable [(text)]="title"></app-editable>
+    </div>
+    <div>
+        @for (taskId of branch.tasks; track $index) {
+            <p>{{network.getTask(taskId).title}}</p>
+        }
+    </div>
+    <app-editable [(text)]="description"></app-editable>
+    <div class="vspace-10"></div>
+    <app-fvp [(fvp)]="product"></app-fvp>
+</app-block>

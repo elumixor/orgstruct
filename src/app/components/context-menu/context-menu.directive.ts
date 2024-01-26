@@ -7,14 +7,17 @@ import { IContextMenuOption } from "./context-menu-option";
     standalone: true,
 })
 export class ContextMenuDirective {
-    @Input({ alias: "appContextMenu", required: true }) options: IContextMenuOption[] = [];
+    @Input({ required: true }) appContextMenu: IContextMenuOption[] = [];
     // @Input() parentContextItems: "inherit" | "ignore" = "inherit";
 
-    constructor(protected readonly contextMenu: ContextMenuComponent, protected readonly hostElement: ElementRef) {
+    constructor(
+        protected readonly contextMenu: ContextMenuComponent,
+        protected readonly hostElement: ElementRef<HTMLElement>,
+    ) {
         hostElement.nativeElement.addEventListener("contextmenu", (event: MouseEvent) => {
             event.preventDefault();
             event.stopPropagation();
-            contextMenu.show(event.clientX, event.clientY, this.options);
+            contextMenu.show(event.clientX, event.clientY, this.appContextMenu);
         });
     }
 }

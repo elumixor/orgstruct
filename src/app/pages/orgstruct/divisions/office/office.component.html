@@ -1,0 +1,12 @@
+<app-block [appContextMenu]="contextMenu" class="office-block">
+    <!-- <p class="text-center mv-5">{{office.title}}</p> -->
+    <div class="flex justify-center">
+        <app-editable [(text)]="title" class="text-center"></app-editable>
+    </div>
+    <div class="vspace-5"></div>
+    @for (branchId of office.branches; track $index) {
+        <app-branch [branch]="network.getBranch(branchId)"></app-branch>
+    }
+    <div class="vspace-10"></div>
+    <app-fvp [(fvp)]="product"></app-fvp>
+</app-block>

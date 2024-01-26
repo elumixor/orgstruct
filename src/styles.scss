@@ -40,6 +40,26 @@ body {
         display: flex;
         flex-direction: row;
     }
+
+    &-grow {
+        flex-grow: 1;
+    }
+
+    &.justify-center {
+        justify-content: center;
+    }
+
+    &.justify-start {
+        justify-content: flex-start;
+    }
+
+    &.justify-end {
+        justify-content: flex-end;
+    }
+
+    &.align-center {
+        align-items: center;
+    }
 }
 
 .inline-flex {
@@ -64,4 +84,16 @@ body {
 
 .absolute {
     position: absolute;
+}
+
+.text-center {
+    text-align: center;
+}
+
+.text-left {
+    text-align: left;
+}
+
+.text-right {
+    text-align: right;
 }

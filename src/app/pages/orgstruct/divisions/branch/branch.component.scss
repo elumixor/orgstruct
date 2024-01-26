@@ -1,0 +1,10 @@
+@use "@styles/colors.scss";
+
+:host {
+    display: contents;
+}
+
+.container {
+    background-color: lighten(colors.$grey, 30%);
+    margin-bottom: 0.5rem;
+}

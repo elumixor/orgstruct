@@ -10,34 +10,9 @@
     "title": "New Position"
   },
   {
-    "id": 1705799784402,
-    "type": "task",
-    "title": "New Task"
-  },
-  {
-    "id": 1705799785347,
-    "type": "other",
-    "title": "New Item"
-  },
-  {
-    "id": 1705838255504,
-    "type": "task",
-    "title": "New Task"
-  },
-  {
-    "id": 1705838257391,
-    "type": "person",
-    "name": "New Person"
-  },
-  {
     "id": 1705838257924,
     "type": "position",
     "title": "New Position"
-  },
-  {
-    "id": 1705843484294,
-    "type": "person",
-    "name": "New Person"
   },
   {
     "id": 1705843484442,
@@ -115,60 +90,36 @@
     "name": "New Person"
   },
   {
-    "title": "Administrative",
-    "id": 1706018193773,
-    "product": "TBD",
+    "id": 1706127341166,
+    "type": "division",
+    "title": "Administrative division",
     "offices": [
-      1706050400741
+      1706127343333
     ],
-    "type": "division"
+    "product": "Best company in the world"
   },
   {
-    "title": "HR",
-    "id": 1706018193773,
-    "product": "TBD",
-    "offices": [],
-    "type": "division"
-  },
-  {
-    "title": "Marketing",
-    "id": 1706018193773,
-    "product": "TBD",
-    "offices": [],
-    "type": "division"
-  },
-  {
-    "title": "Finance",
-    "id": 1706018193773,
-    "product": "TBD",
-    "offices": [],
-    "type": "division"
-  },
-  {
-    "title": "Tech",
-    "id": 1706018193773,
-    "product": "TBD",
-    "offices": [],
-    "type": "division"
-  },
-  {
-    "title": "QA",
-    "id": 1706018193773,
-    "product": "TBD",
-    "offices": [],
-    "type": "division"
-  },
-  {
-    "title": "PR",
-    "id": 1706018193773,
-    "product": "TBD",
-    "offices": [],
-    "type": "division"
-  },
-  {
-    "id": 1706050400741,
+    "id": 1706127343333,
     "type": "office",
-    "title": "New Office",
-    "division": 1706018193773
+    "title": "Owner",
+    "division": 1706127341166,
+    "product": "Best company in the world",
+    "branches": [
+      1706133381776
+    ]
+  },
+  {
+    "id": 1706128223246,
+    "type": "task",
+    "title": "New Task"
+  },
+  {
+    "id": 1706133381776,
+    "type": "branch",
+    "title": "Owner",
+    "office": 1706127343333,
+    "tasks": [],
+    "product": "Best company in the world",
+    "description": "Does important stuff"
   }
 ]

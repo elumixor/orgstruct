@@ -1,39 +1,49 @@
-import { IOffice, ItemObject, ItemType } from "@domain";
+import { IDivision, IOffice, ItemObject, ItemType } from "@domain";
 import { DBEntry } from "@utils";
 
-export function create<T extends ItemType>(
-    kind: T,
-    params: Record<string, unknown>,
-    database: DBEntry<ItemObject>[]
-): DBEntry<ItemObject<T>> {
-    type R<T extends ItemType = ItemType> = DBEntry<ItemObject<T>>;
+type R<T extends ItemType = ItemType> = DBEntry<ItemObject<T>>;
 
+export function create<T extends ItemType>(
+    type: T,
+    params: Record<string, unknown>,
+    database: DBEntry<ItemObject>[],
+): DBEntry<ItemObject<T>> {
+    type RT = R<T>;
     // Get a unique ID for it
     const id = Date.now();
-    const result = { id, type: kind } as R<T>;
+    function created<T extends ItemType>(item: Omit<R<T>, "id" | "type">) {
+        return { id, type, ...item } as RT;
+    }
 
-    if (kind === "task") (result as R<"task">).title = "New Task";
-    else if (kind === "person") (result as R<"person">).name = "New Person";
-    else if (kind === "position") (result as R<"position">).title = "New Position";
-    else if (kind === "office") {
-        const office = result as R<"office">;
-        office.title = "New Office";
-        office.division = (params as { divisionId: number }).divisionId;
+    if (type === "task") return created<"task">({ title: "New Task" });
+    if (type === "person") return created<"person">({ name: "New Person" });
+    if (type === "position") return created<"position">({ title: "New Position" });
+    if (type === "division") return created<"division">({ title: "New Division", offices: [], product: "TBD" });
+    if (type === "office") {
+        const { divisionId: division } = params as { divisionId: number };
+        const office = created<"office">({
+            title: "New Office",
+            division,
+            product: "TBD",
+            branches: [],
+        });
+
         // Add the office to the division
-        const division = database.find((item) => item.id === office.division) as R<"division"> | undefined;
-        division?.offices.push(id);
-    } else (result as R<"other">).title = "New Item";
+        (database.find((item) => item.id === division) as DBEntry<IDivision>)?.offices.push(id);
 
-    return result;
-}
+        // Return the office
+        return office;
+    }
+    if (type === "branch") {
+        const { officeId: office } = params as { officeId: number };
+        const branch = created<"branch">({ title: "New Branch", office, tasks: [], product: "TBD" });
 
-export function createOffice(divisionId: number): DBEntry<IOffice> {
-    return {
-        title: "New Office",
-        id: Date.now(),
-        division: divisionId,
-        type: "office",
-        product: "TBD",
-        branches: [],
-    };
+        // Add the branch to the office
+        (database.find((item) => item.id === office) as DBEntry<IOffice>)?.branches.push(id);
+
+        // Return the branch
+        return branch;
+    }
+
+    return created<"other">({ title: "New Item" });
 }
