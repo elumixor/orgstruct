@@ -1,11 +1,15 @@
+import { IAssignable } from "./assignable";
 import { IBaseInfo } from "./base-info";
-import { IEstimate } from "./estimate";
-import { IPosition } from "./position";
+import { IBranch } from "./branch";
+import { IEstimable } from "./estimable";
+import { IProcess } from "./process";
+import { IProducer } from "./producer";
 
-export interface ITask extends IBaseInfo {
-    assignee?: IPosition;
-    hours?: IEstimate;
+export interface ITask extends IBaseInfo, IProducer, IAssignable, IEstimable {
+    branch?: IBranch;
+    process?: IProcess;
     supertask?: ITask;
     subtasks?: ITask[];
     requirements?: ITask[];
+    requiredBy?: ITask[];
 }

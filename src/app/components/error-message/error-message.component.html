@@ -1,0 +1,12 @@
+<ng-content></ng-content>
+
+@if (error()) {
+    <div class="container">
+        <h4>
+            Errors:
+        </h4>
+        <div class="background">
+            {{error()}}
+        </div>
+    </div>
+}

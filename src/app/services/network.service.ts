@@ -1,73 +1,68 @@
 import { HttpClient } from "@angular/common/http";
 import { Injectable, signal } from "@angular/core";
-import { first } from "rxjs";
-import { ItemObject, ItemType } from "../../domain";
-import { DBEntry, Primitive } from "../../utils";
+import { DatabaseName, Identifier, ItemKey, ItemObject, ItemType } from "@domain";
+import { IRequests } from "@network-api";
+import { DBEntry, Primitive, Refs2Id } from "@utils";
+import { lastValueFrom, tap } from "rxjs";
+import { itemsProperties } from "../../../server/api/property-types";
 
 @Injectable({
     providedIn: "root",
 })
-export class NetworkService {
-    readonly data = signal<DBEntry<ItemObject>[]>([]);
+export class NetworkService implements IRequests {
+    readonly currentError = signal<string | undefined>(undefined);
 
-    constructor(protected readonly http: HttpClient) {
-        this.updateData();
+    constructor(private readonly http: HttpClient) {}
+
+    // Requests
+    get<T extends ItemType>(itemType: T, params: Identifier) {
+        return this.post<DBEntry<T>>(`get/${itemType}`, params);
+    }
+    create<T extends ItemType>(itemType: T, params: Refs2Id<ItemObject<T>>) {
+        return this.post<Identifier>(`create/${itemType}`, stripUnneeded(itemType, params));
+    }
+    update<T extends ItemType>(itemType: T, params: Identifier & Partial<Refs2Id<ItemObject<T>>>) {
+        return this.post<void>(`update/${itemType}`, { ...stripUnneeded(itemType, params), id: params.id });
+    }
+    delete<T extends ItemType>(itemType: T, params: Identifier) {
+        return this.post<void>(`delete/${itemType}`, params);
+    }
+    databases() {
+        return this.post<Record<DatabaseName, string>>("databases");
     }
 
-    create(item: ItemType, params: Record<string, unknown> = {}) {
-        this.http.post("/api/create", { type: item, ...params }).subscribe(() => this.updateData());
+    async pages<T extends ItemType, P extends ItemKey<T> = ItemKey<T>>(
+        itemType: T,
+        params: { properties?: P[] } = {},
+    ): Promise<(DBEntry<T> & Identifier & { type: T })[]> {
+        return this.post<(DBEntry<T> & Identifier & { type: T })[]>(`pages/${itemType}`, params);
     }
 
-    remove(item: DBEntry<ItemObject>) {
-        this.http.post("/api/remove", { id: item.id }).subscribe(() => this.updateData());
+    // Helpers
+    private post<T = unknown>(path: string, params?: Record<string, unknown>) {
+        return lastValueFrom(
+            this.http.post(`/api/${path}`, params).pipe(
+                tap({
+                    error: (e: { error?: { message?: string } }) =>
+                        this.currentError.set(e.error?.message ?? "Unknown error"),
+                }),
+            ),
+        ) as Promise<T>;
     }
+}
 
-    update(item: DBEntry<ItemObject>, params: Record<string, unknown> = {}) {
-        this.http.post("/api/update", { id: item.id, ...params }).subscribe(() => this.updateData());
-    }
+function stripUnneeded<T extends ItemType, P extends Partial<Refs2Id<ItemObject<T>>>>(itemType: T, params: P) {
+    return Object.fromEntries(
+        itemsProperties[itemType]
+            .filter((property) => Reflect.has(params, property))
+            .map((property) => [property, leaveIdentifier(params[property])] as const),
+    ) as unknown as P;
+}
 
-    toDbEntry(item: ItemObject) {
-        return Object.fromEntries(
-            Object.entries(item).map(([key, value]) => [key, this.fromObject(value)]),
-        ) as DBEntry<ItemObject>;
-    }
-
-    fromObject(value: unknown): Primitive | Primitive[] {
-        if (typeof value !== "object") return value as Primitive;
-        if (Array.isArray(value)) return value.map((obj) => this.fromObject(obj)) as Primitive[];
-        return (value as { id: number }).id;
-    }
-
-    get<T extends ItemType = ItemType>(itemId: number) {
-        return this.data().find(({ id }) => id === itemId) as DBEntry<ItemObject<T>>;
-    }
-
-    getOffice(id: number) {
-        return this.get<"office">(id);
-    }
-
-    getDivision(id: number) {
-        return this.get<"division">(id);
-    }
-
-    getBranch(id: number) {
-        return this.get<"branch">(id);
-    }
-
-    getPerson(id: number) {
-        return this.get<"person">(id);
-    }
-
-    getPosition(id: number) {
-        return this.get<"position">(id);
-    }
-
-    getTask(id: number) {
-        return this.get<"task">(id);
-    }
-
-    protected updateData() {
-        const data = this.http.post("/api/data", {});
-        data.pipe(first()).subscribe((data) => this.data.set(data as DBEntry<ItemObject>[]));
-    }
+function leaveIdentifier(
+    obj: Record<string, unknown> | Identifier | Primitive | Array<Identifier | Primitive>,
+): Primitive | Identifier | Array<Identifier | Primitive> {
+    if (Array.isArray(obj)) return obj.map(leaveIdentifier) as Array<Identifier | Primitive>;
+    if (typeof obj === "object") return { id: (obj as Identifier).id };
+    return obj as Primitive;
 }

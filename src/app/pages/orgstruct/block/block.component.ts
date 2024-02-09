@@ -30,8 +30,8 @@ export class BlockComponent {
     // resizerVisible = true;
     // isDragging = false;
 
-    // protected startX = 0;
-    // protected startY = 0;
+    // private startX = 0;
+    // private startY = 0;
 
     // @HostListener("window:pointerdown", ["$event"])
     // onResizeStart(event: Event) {

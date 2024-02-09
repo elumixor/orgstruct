@@ -4,5 +4,8 @@ export * from "./image-with-text/image-with-text.component";
 export * from "./search-bar/search-bar.component";
 export * from "./search-overlay/search-overlay.component";
 export * from "./editable/editable.component";
+export * from "./error-message/error-message.component";
+export * from "./loader/loader.component";
+export * from "./lazy";
 export * from "./context-menu";
 export * from "./navigation";

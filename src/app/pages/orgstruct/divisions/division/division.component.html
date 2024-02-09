@@ -1,15 +1,33 @@
 <div class="container flex-column gap-5 p-10 m-5" [appContextMenu]="contextMenuDivision">
-    <app-editable [(text)]="title" class="title mv-0 mh-10 bold italic"></app-editable>
+    <app-editable [(text)]="division.title" class="title mv-0 mh-10 bold italic"></app-editable>
+
     <div class="flex-row gap-10">
-        @if (division.offices.length > 0) {
-            @for (officeId of division.offices; track $index) {
-                <app-office [office]="getOffice(officeId)"></app-office>
-            }
-        } @else {
-            <button (click)="addOffice()">Add Office</button>
-        }
-        </div>
+
+        <app-lazy [when]="offices()" loadText="Loading offices..." [minTime]="1">
+            <ng-template appLazyTarget>
+
+                @for (office of offices(); track $index) {
+
+                    <app-lazy [when]="office()" loadText="Loading office..." [minTime]="1">
+                        <ng-template appLazyTarget>
+
+                        @if (office()) {
+                            <app-office [office]="office()!" (removed)="offices.remove(office)" ></app-office>
+                        }
+
+                        </ng-template>
+                    </app-lazy>
+
+                }
+
+            </ng-template>
+        </app-lazy>
+
+        @if (offices()?.isEmpty) { <button (click)="offices.add()">Add Office</button> }
+
+    </div>
+
     <app-block class="mv-5">
-        <app-fvp [(fvp)]="product"></app-fvp>
+        <app-fvp [(fvp)]="division.product"></app-fvp>
     </app-block>
 </div>

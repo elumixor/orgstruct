@@ -1,12 +1,12 @@
 import { IBaseInfo } from "./base-info";
-import { IDivision } from "./division";
 import { IPerson } from "./person";
+import { IProcess } from "./process";
 import { ITask } from "./task";
 
 export interface IPosition extends IBaseInfo {
-    department?: IDivision; // for owner and CEO - they don't have a department
     tasks?: ITask[];
-    assignee?: IPerson;
+    processes?: IProcess[];
     subordinates?: IPosition[];
     supervisor?: IPosition;
+    person?: IPerson;
 }

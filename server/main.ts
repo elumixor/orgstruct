@@ -1,14 +1,15 @@
-import { DB } from "./db/db";
+import { green } from "@utils";
+import { Api } from "./api";
 import { server } from "./server";
 
 const port = process.env["PORT"] || 4000;
 
-// Create a database
-const db = new DB();
+// Create an api
+const api = new Api();
 
-// Start up the Node server
-const s = server(db);
+// Start up the express server
+const s = server(api);
 
 s.listen(port, () => {
-    console.log(`Node Express server listening on http://localhost:${port}`);
+    console.log(green(`Listening on http://localhost:${port}`));
 });

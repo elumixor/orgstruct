@@ -1,2 +1,2 @@
 export * from "./network.service";
-export * from "./platform.service";
+export * from "./proxifier.service";

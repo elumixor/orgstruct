@@ -1,23 +1,17 @@
-import { Component, computed } from "@angular/core";
-import { NetworkService } from "@services";
-import { DBEntry } from "@utils";
-import { IDivision } from "@domain";
+import { Component, inject } from "@angular/core";
+import { ProxifierService } from "@services";
+import { LazyComponent, LazyTargetDirective } from "@components";
 import { DivisionComponent } from "./division/division.component";
 
 @Component({
     selector: "app-divisions",
     standalone: true,
-    imports: [DivisionComponent],
+    imports: [DivisionComponent, LazyComponent, LazyTargetDirective],
     templateUrl: "./divisions.component.html",
     styleUrl: "./divisions.component.scss",
 })
 export class DivisionsComponent {
-    readonly divisions;
-
-    constructor(protected readonly network: NetworkService) {
-        this.divisions = computed(() => {
-            const data = this.network.data();
-            return data.filter((item) => item.type === "division") as DBEntry<IDivision>[];
-        });
-    }
+    readonly divisions = inject(ProxifierService).lazyCollection("division", {
+        initialValue: { title: "New Division", description: "", product: "", offices: [] },
+    });
 }

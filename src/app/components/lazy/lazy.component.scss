@@ -1,0 +1,13 @@
+.invisible {
+    opacity: 0;
+    position: absolute;
+    pointer-events: none;
+    // display: block;
+    // width: max-content;
+    // height: max-content;
+    // display: flex;
+}
+
+:host, .content-wrapper {
+    display: contents;
+}

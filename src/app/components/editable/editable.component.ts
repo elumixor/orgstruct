@@ -13,10 +13,10 @@ export class EditableComponent {
     @Output() textChange = new EventEmitter<string>();
     focused = false;
 
-    @ViewChild("inputRef") protected readonly inputRef?: ElementRef<HTMLInputElement>;
+    @ViewChild("inputRef") private readonly inputRef?: ElementRef<HTMLInputElement>;
 
-    protected _text?: string;
-    protected previousText?: string;
+    private _text?: string;
+    private previousText?: string;
 
     @Input()
     set text(value: string | undefined) {
@@ -28,11 +28,6 @@ export class EditableComponent {
         return this._text;
     }
 
-    // cancel() {
-    //     console.log("cancel");
-    //     this._text = this.previousText;
-    // }
-
     blur() {
         this.focused = false;
         this.inputRef?.nativeElement.blur();
@@ -43,7 +38,12 @@ export class EditableComponent {
         this.focused = true;
     }
 
-    protected sync() {
+    onInput(event: Event) {
+        this._text = (event.target as HTMLInputElement).value;
+        this.sync();
+    }
+
+    private sync() {
         this.previousText = this._text;
         this.textChange.emit(this._text);
     }

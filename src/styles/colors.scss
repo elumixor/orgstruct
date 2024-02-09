@@ -13,6 +13,8 @@ $pr: #449586;
 $danger: #b3082d;
 $action: #007bac;
 
+$accent: #da4088;
+
 .bg-white {
     background-color: $white;
 }
@@ -21,10 +23,14 @@ $action: #007bac;
     background-color: $grey;
 }
 
-.fg-white {
+.white {
     color: $white;
 }
 
-.fg-grey {
+.grey {
     color: $grey;
+}
+
+.accent {
+    color: $accent;
 }

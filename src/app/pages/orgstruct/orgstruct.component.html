@@ -1,20 +1,14 @@
-<div class="grid" (wheel)="onWheel($event)" (pointerdown)="onPointerDown($event)" (pointerup)="onPointerUp($event)"
-    (pointermove)="onPointerMove($event)" [appContextMenu]="contextMenuOptions">
-    <div class="content" [style.transform]="transform" [style.left]="x" [style.top]="y">
-        <app-block [x]="10" [y]="10" #ownerRef>
+<div class="grid" [appContextMenu]="contextMenuOptions" #gridRef>
+    <div class="content" #contentRef>
+        <!-- <app-block [x]="10" [y]="10" #ownerRef>
             Owner
-        </app-block>
+        </app-block> -->
 
-
-        <app-block [x]="100" [y]="100" #ceoRef>
+        <!-- <app-block [x]="100" [y]="100" #ceoRef>
             CEO
-        </app-block>
+        </app-block> -->
 
+        @defer { <app-divisions class="divisions"></app-divisions> }
 
-        <app-divisions class="divisions"></app-divisions>
-
-        <svg>
-            <g appConnector [from]="ownerRef" [to]="ceoRef"></g>
-        </svg>
     </div>
 </div>

@@ -1,0 +1,20 @@
+@if (showContent()) {
+    <div class="content-wrapper" @fadeIn>
+            <ng-content *ngTemplateOutlet="body"></ng-content>
+    </div>
+} @else {
+    <div class="lazy"
+            [@grow]="{ value: shouldGrow() && timeElapsed() ? 'out' : 'in', params: animationParams() }"
+            (@grow.done)="onGrowDone($event)"
+            >
+        <app-loader [text]="loadText"></app-loader>
+    </div>
+}
+
+@if (!shouldGrow()) {
+    <div class="invisible" #invisibleRef>
+        @if (renderTemplate()) {
+            <ng-content *ngTemplateOutlet="body"></ng-content>
+        }
+    </div>
+}

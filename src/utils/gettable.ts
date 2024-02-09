@@ -1,14 +1,25 @@
-export function gettable<T>(fn: () => Promise<T>) {
+export function lazy<T>(fn: () => PromiseLike<T>) {
+    let currentValue: T | undefined;
     let inProgress = false;
-    let currentPromise: Promise<T>;
+    let currentPromise: PromiseLike<T> | undefined;
 
     return {
-        get() {
-            if (inProgress) return currentPromise;
-            inProgress = true;
+        async get() {
+            if (currentValue !== undefined) return currentValue;
+            if (inProgress) return currentPromise as PromiseLike<T>;
+
             currentPromise = fn();
-            currentPromise.finally(() => (inProgress = false));
-            return currentPromise;
+            inProgress = true;
+
+            try {
+                return currentPromise;
+            } finally {
+                inProgress = false;
+            }
+        },
+        refresh() {
+            currentValue = undefined;
+            return this.get();
         },
     };
 }

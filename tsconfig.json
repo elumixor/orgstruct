@@ -29,13 +29,15 @@
             "@components": ["./src/app/components"],
             "@components/*": ["./src/app/components/*"],
             "@services": ["./src/app/services"],
-            "@services/*": ["./src/app/services/*"]
-        }
+            "@services/*": ["./src/app/services/*"],
+            "@network-api": ["./src/network-api"],
+            "@animations": ["./src/app/animations"],
+        },
     },
     "angularCompilerOptions": {
         "enableI18nLegacyMessageIdFormat": false,
         "strictInjectionParameters": true,
         "strictInputAccessModifiers": true,
-        "strictTemplates": true
-    }
+        "strictTemplates": true,
+    },
 }

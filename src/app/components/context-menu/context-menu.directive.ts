@@ -10,10 +10,7 @@ export class ContextMenuDirective {
     @Input({ required: true }) appContextMenu: IContextMenuOption[] = [];
     // @Input() parentContextItems: "inherit" | "ignore" = "inherit";
 
-    constructor(
-        protected readonly contextMenu: ContextMenuComponent,
-        protected readonly hostElement: ElementRef<HTMLElement>,
-    ) {
+    constructor(contextMenu: ContextMenuComponent, hostElement: ElementRef<HTMLElement>) {
         hostElement.nativeElement.addEventListener("contextmenu", (event: MouseEvent) => {
             event.preventDefault();
             event.stopPropagation();

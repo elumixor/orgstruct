@@ -1,4 +1,4 @@
-import { Component, ElementRef, ViewChild, afterNextRender } from "@angular/core";
+import { ChangeDetectorRef, Component, ElementRef, ViewChild, afterNextRender } from "@angular/core";
 import { IContextMenuOption } from "./context-menu-option";
 
 @Component({
@@ -12,17 +12,20 @@ export class ContextMenuComponent {
     visible = true;
     options: IContextMenuOption[] = [];
 
-    @ViewChild("containerRef") protected readonly containerRef?: ElementRef<HTMLDivElement>;
+    @ViewChild("containerRef") private readonly containerRef?: ElementRef<HTMLDivElement>;
 
-    protected _x = 0;
-    protected _y = 0;
+    private _x = 0;
+    private _y = 0;
 
-    constructor() {
+    constructor(changeDetectorRef: ChangeDetectorRef) {
         afterNextRender(() => {
             // Register click outside the context menu to close it
             window.addEventListener("pointerdown", (e) => {
                 const nativeElement = this.containerRef?.nativeElement;
-                if (!nativeElement || !e.composedPath().includes(this.containerRef.nativeElement)) this.visible = false;
+                if (!nativeElement || !e.composedPath().includes(this.containerRef.nativeElement) || e.button !== 2) {
+                    this.visible = false;
+                    changeDetectorRef.detectChanges();
+                }
             });
         });
     }

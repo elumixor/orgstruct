@@ -1,0 +1,7 @@
+<div class="container flex flex-column text-center align-center justify-center gap-20 p-15 rounded-small"
+     [style.width]="width ?? 'initial'"
+     [style.height]="height ?? 'initial'"
+>
+    <div class="loader"></div>
+    @if (text) { <div class="bold italic grey blink">{{text}}</div> }
+</div>

@@ -1,58 +1,65 @@
-import { Component, Input } from "@angular/core";
-import { IDivision } from "@domain";
+import { Component, EventEmitter, Input, Output, inject } from "@angular/core";
+import {
+    ContextMenuDirective,
+    EditableComponent,
+    IContextMenuOption,
+    LazyTargetDirective,
+    LazyComponent,
+} from "@components";
+import { LazyCollection, ProxifierService } from "@services";
 import { DBEntry } from "@utils";
-import { NetworkService } from "@services";
-import { ContextMenuDirective, EditableComponent, IContextMenuOption } from "@components";
 import { BlockComponent } from "../../block/block.component";
-import { OfficeComponent } from "../office/office.component";
 import { FVPComponent } from "../fvp/fvp.component";
+import { OfficeComponent } from "../office/office.component";
 
 @Component({
     selector: "app-division",
     standalone: true,
-    imports: [BlockComponent, OfficeComponent, ContextMenuDirective, FVPComponent, EditableComponent],
+    imports: [
+        BlockComponent,
+        OfficeComponent,
+        ContextMenuDirective,
+        FVPComponent,
+        EditableComponent,
+        LazyComponent,
+        LazyTargetDirective,
+    ],
     templateUrl: "./division.component.html",
     styleUrl: "./division.component.scss",
+    animations: [],
 })
 export class DivisionComponent {
-    @Input({ required: true }) division!: DBEntry<IDivision>;
+    @Output() readonly removed = new EventEmitter();
 
     readonly contextMenuDivision: IContextMenuOption[] = [
         {
             text: "Delete division",
-            action: () => this.network.remove(this.division),
+            action: () => this.removed.emit(),
         },
         {
             text: "Add office",
-            action: () => this.addOffice(),
+            action: () => this.offices.add(),
         },
     ];
 
-    constructor(protected readonly network: NetworkService) {}
+    private _division?: DBEntry<"division">;
+    private _offices?: LazyCollection<"office">;
 
-    get title() {
-        return this.division.title;
+    private readonly proxy = inject(ProxifierService);
+
+    @Input({ required: true }) set division(value: DBEntry<"division">) {
+        this._division = value;
+        this._offices = this.proxy.lazyCollection("office", {
+            ids: value.offices,
+            initialValue: { division: value, title: "New office", description: "", product: "", branches: [] },
+        });
     }
 
-    set title(value) {
-        this.division.title = value;
-        this.network.update(this.division, { title: value });
+    get division() {
+        return this._division!;
     }
 
-    get product() {
-        return this.division.product;
-    }
-
-    set product(value) {
-        this.division.product = value;
-        this.network.update(this.division, { product: value });
-    }
-
-    addOffice() {
-        this.network.create("office", { divisionId: this.division.id });
-    }
-
-    getOffice(officeId: number) {
-        return this.network.get<"office">(officeId);
+    get offices() {
+        return this._offices!;
     }
 }

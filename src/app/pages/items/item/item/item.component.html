@@ -2,5 +2,5 @@
     @if (image) { <img [src]="image" alt="item image"> }
     @if (title) { <span>{{title}}</span> }
 
-    <div class="remove" [class.visible]="removeVisible" (click)="remove.emit()">Remove</div>
+    <div class="remove" [class.visible]="removeVisible" (pointerdown)="remove.emit()">Remove</div>
 </div>

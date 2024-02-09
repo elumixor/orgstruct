@@ -3,6 +3,9 @@
 @use "@styles/layout.scss";
 
 @use "@styles/elements/button.scss";
+@use "@styles/elements/loader.scss";
+
+@use "@styles/animations.scss";
 
 html {
     background-color: #eee;

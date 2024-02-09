@@ -30,6 +30,6 @@ export class NavBarItemComponent {
 
     @HostListener("click")
     onClick() {
-        this.router.navigate([this.path]);
+        void this.router.navigate([this.path]);
     }
 }

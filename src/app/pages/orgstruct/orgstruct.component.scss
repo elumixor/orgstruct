@@ -24,11 +24,19 @@ svg {
     position: relative;
     transition: transform 0.1s linear;
 
-    >* {
+    > * {
         position: absolute;
     }
 }
 
 .divisions {
-    top: 200px;
+    // top: 200px;
+    flex-grow: 1;
+}
+
+.divisions-loader {
+    position: fixed !important;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
 }

@@ -1,7 +1,12 @@
-import { Component, Input } from "@angular/core";
-import { ContextMenuDirective, EditableComponent, IContextMenuOption } from "@components";
-import { IOffice } from "@domain";
-import { NetworkService } from "@services";
+import { Component, EventEmitter, Input, Output, inject } from "@angular/core";
+import {
+    ContextMenuDirective,
+    EditableComponent,
+    IContextMenuOption,
+    LazyTargetDirective,
+    LazyComponent,
+} from "@components";
+import { LazyCollection, ProxifierService } from "@services";
 import { DBEntry } from "@utils";
 import { BlockComponent } from "../../block/block.component";
 import { BranchComponent } from "../branch/branch.component";
@@ -10,41 +15,57 @@ import { FVPComponent } from "../fvp/fvp.component";
 @Component({
     selector: "app-office",
     standalone: true,
-    imports: [BlockComponent, ContextMenuDirective, BranchComponent, FVPComponent, EditableComponent],
+    imports: [
+        BlockComponent,
+        ContextMenuDirective,
+        BranchComponent,
+        FVPComponent,
+        EditableComponent,
+        LazyComponent,
+        LazyTargetDirective,
+    ],
     templateUrl: "./office.component.html",
     styleUrl: "./office.component.scss",
 })
 export class OfficeComponent {
-    @Input({ required: true }) office!: DBEntry<IOffice>;
+    @Output() readonly removed = new EventEmitter();
 
     readonly contextMenu: IContextMenuOption[] = [
         {
             text: "Remove office",
-            action: () => this.network.remove(this.office),
+            action: () => this.removed.emit(),
         },
         {
             text: "Add branch",
-            action: () => this.network.create("branch", { officeId: this.office.id }),
+            action: () => this.branches.add(),
         },
     ];
 
-    constructor(readonly network: NetworkService) {}
+    private readonly proxy = inject(ProxifierService);
 
-    get title() {
-        return this.office.title;
+    private _office?: DBEntry<"office">;
+    private _branches?: LazyCollection<"branch">;
+
+    @Input({ required: true }) set office(value: DBEntry<"office">) {
+        this._office = value;
+        this._branches = this.proxy.lazyCollection("branch", {
+            ids: value.branches,
+            initialValue: {
+                office: value,
+                title: "New branch",
+                description: "",
+                product: "",
+                tasks: [],
+                processes: [],
+            },
+        });
     }
 
-    set title(value) {
-        this.office.title = value;
-        this.network.update(this.office, { title: value });
+    get office() {
+        return this._office!;
     }
 
-    get product() {
-        return this.office.product;
-    }
-
-    set product(value) {
-        this.office.product = value;
-        this.network.update(this.office, { product: value });
+    get branches() {
+        return this._branches!;
     }
 }

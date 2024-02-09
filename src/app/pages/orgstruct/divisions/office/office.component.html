@@ -1,12 +1,32 @@
-<app-block [appContextMenu]="contextMenu" class="office-block">
-    <!-- <p class="text-center mv-5">{{office.title}}</p> -->
+<app-block [appContextMenu]="contextMenu" class="office-block gap-10 ">
+    <!-- Title -->
     <div class="flex justify-center">
-        <app-editable [(text)]="title" class="text-center"></app-editable>
+        <app-editable [(text)]="office.title" class="text-center"></app-editable>
     </div>
-    <div class="vspace-5"></div>
-    @for (branchId of office.branches; track $index) {
-        <app-branch [branch]="network.getBranch(branchId)"></app-branch>
-    }
-    <div class="vspace-10"></div>
-    <app-fvp [(fvp)]="product"></app-fvp>
+
+    <!-- Collection of branches, lazily loaded -->
+    <div class="flex-column"> <!-- Container to remove gap between the branch blocks -->
+
+        <app-lazy [when]="branches" loadText="Loading branches...">
+            <ng-template appLazyTarget>
+
+                @for (branch of branches(); track $index) {
+
+                    <app-lazy [when]="branch()" loadText="Loading branch...">
+                        <ng-template appLazyTarget>
+
+                            <!-- @if (branch()) { -->
+                                <app-branch [branch]="branch()!" (removed)="branches.remove(branch)"></app-branch>
+                            <!-- } -->
+
+                        </ng-template>
+                    </app-lazy>
+                }
+
+            </ng-template>
+        </app-lazy>
+
+    </div>
+
+    <app-fvp [(fvp)]="office.product"></app-fvp>
 </app-block>

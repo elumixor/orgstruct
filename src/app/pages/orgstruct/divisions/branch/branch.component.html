@@ -1,14 +1,31 @@
-<app-block [appContextMenu]="contextMenu" class="container">
-    <!-- <p class="text-center mv-5">{{branch.title}}</p> -->
+<app-block [appContextMenu]="contextMenu" class="container" @grow>
+
+    <!-- Title -->
     <div class="flex justify-center bold italic text-center">
-        <app-editable [(text)]="title"></app-editable>
+        <app-editable [(text)]="branch.title"></app-editable>
     </div>
-    <div>
-        @for (taskId of branch.tasks; track $index) {
-            <p>{{network.getTask(taskId).title}}</p>
-        }
-    </div>
-    <app-editable [(text)]="description"></app-editable>
+
+    <!-- Editable -->
+    <app-editable [(text)]="branch.description" placeholder="Description goes here..."></app-editable>
+
+    <!-- Tasks -->
+    <!-- <app-lazy [when]="tasks" loadText="Loading tasks...">
+        <ng-template appLazyTarget> -->
+            @for (task of tasks(); track $index) {
+                <p @grow>{{task()?.title}}</p>
+            }
+        <!-- </ng-template>
+    </app-lazy> -->
+
+    <!-- Processes -->
+    <!-- <app-lazy [when]="processes" loadText="Loading processes...">
+        <ng-template appLazyTarget> -->
+            @for (process of processes(); track $index) {
+                <p @grow>{{process()?.title}}</p>
+            }
+        <!-- </ng-template>
+    </app-lazy> -->
+
     <div class="vspace-10"></div>
-    <app-fvp [(fvp)]="product"></app-fvp>
+    <app-fvp [(fvp)]="branch.product"></app-fvp>
 </app-block>

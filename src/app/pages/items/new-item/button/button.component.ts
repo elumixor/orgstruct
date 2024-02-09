@@ -14,9 +14,9 @@ export class NewItemButtonComponent {
     @ViewChild("button") button?: ElementRef<HTMLButtonElement>;
     @ViewChild("bar") bar?: ElementRef<HTMLDivElement>;
 
-    protected _barVisible = false;
+    private _barVisible = false;
 
-    constructor(protected readonly network: NetworkService) {}
+    constructor(private readonly network: NetworkService) {}
 
     get barVisible() {
         return this._barVisible;
@@ -48,7 +48,7 @@ export class NewItemButtonComponent {
 
     create(type: ItemType) {
         // const db = useContext(DBContext);
-        this.network.create(type);
+        // this.network.create(type);
         console.log("creating " + type);
         // console.log(db);
         // await db?.create(type);

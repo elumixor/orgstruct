@@ -1,5 +1,5 @@
 import { Component, EventEmitter, Input, Output } from "@angular/core";
-import { ItemObject } from "@domain";
+import { ItemType } from "@domain";
 import { DBEntry } from "@utils";
 
 @Component({
@@ -10,13 +10,13 @@ import { DBEntry } from "@utils";
     styleUrl: "./item.component.scss",
 })
 export class ItemComponent {
-    @Input({ required: true }) item!: DBEntry<ItemObject>;
+    @Input({ required: true }) item!: DBEntry<ItemType>;
     @Output() remove = new EventEmitter();
 
     removeVisible = false;
 
     get image() {
-        return "image" in this.item ? this.item.image : undefined;
+        return "image" in this.item ? (this.item as { imageUrl?: string }).imageUrl : undefined;
     }
 
     get title() {
