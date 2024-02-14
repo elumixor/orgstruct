@@ -9,7 +9,8 @@
             },
             "extends": [
                 "eslint:recommended",
-                "plugin:@typescript-eslint/recommended",
+                "plugin:@typescript-eslint/strict-type-checked",
+                "plugin:@typescript-eslint/stylistic-type-checked",
                 "plugin:@angular-eslint/recommended",
                 "plugin:@angular-eslint/template/process-inline-templates"
             ],
@@ -49,6 +50,21 @@
                             {
                                 "pattern": "rxjs/**",
                                 "group": "external",
+                                "position": "before"
+                            },
+                            {
+                                "pattern": "@domain/**",
+                                "group": "internal",
+                                "position": "before"
+                            },
+                            {
+                                "pattern": "@utils/**",
+                                "group": "internal",
+                                "position": "before"
+                            },
+                            {
+                                "pattern": "@components/**",
+                                "group": "internal",
                                 "position": "before"
                             }
                         ],
@@ -120,6 +136,7 @@
                     }
                 ],
                 // "import/no-default-export": "error",
+                "object-shorthand": "error",
                 "import/order": "error",
                 "import/no-duplicates": "error",
                 "@typescript-eslint/explicit-member-accessibility": [

@@ -10,7 +10,13 @@ export const growAnimation = ({
     name = "grow",
     direction = "both",
     duration = "0.5s",
-}: { direction?: "vertical" | "horizontal" | "both"; duration?: `${number}${"s" | "ms"}`; name?: string } = {}) => {
+    transition: t = "void => *",
+}: {
+    direction?: "vertical" | "horizontal" | "both";
+    duration?: `${number}${"s" | "ms"}`;
+    name?: string;
+    transition?: `${"void" | "*"} ${"" | "<"}=${"" | ">"} ${"void" | "*"}`;
+} = {}) => {
     const startParams: { height?: string; width?: string; transform: string } = {
         height: "0",
         width: "0",
@@ -21,6 +27,6 @@ export const growAnimation = ({
 
     return trigger(name, [
         state("in", style({ height: "unset", width: "unset", transform: "scale(1)" })),
-        transition("void => *", [style(startParams), animate(`${duration} ease-in-out`)]),
+        transition(t, [style(startParams), animate(`${duration} ease-in-out`)]),
     ]);
 };

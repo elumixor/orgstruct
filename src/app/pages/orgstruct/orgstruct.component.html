@@ -1,14 +1,12 @@
-<div class="grid" [appContextMenu]="contextMenuOptions" #gridRef>
-    <div class="content" #contentRef>
-        <!-- <app-block [x]="10" [y]="10" #ownerRef>
-            Owner
-        </app-block> -->
+<div class="background" #backgroundRef></div>
 
-        <!-- <app-block [x]="100" [y]="100" #ceoRef>
-            CEO
-        </app-block> -->
+<app-cards-manager class="centered">
 
-        @defer { <app-divisions class="divisions"></app-divisions> }
 
-    </div>
-</div>
+
+    <!-- Just do yourself a favor and don't create templates inside the other components... -->
+
+    <ng-template appCardContent>
+        <app-main></app-main>
+    </ng-template>
+</app-cards-manager>

@@ -1,9 +1,0 @@
-:host {
-    display: flex;
-    gap: 30px;
-    width: max-content;
-
-    & > * {
-        flex-grow: 1;
-    }
-}

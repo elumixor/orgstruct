@@ -4,6 +4,7 @@
 
 @use "@styles/elements/button.scss";
 @use "@styles/elements/loader.scss";
+@use "@styles/elements/block.scss";
 
 @use "@styles/animations.scss";
 
@@ -99,4 +100,12 @@ body {
 
 .text-right {
     text-align: right;
+}
+
+.text-small {
+    font-size: 0.8em;
+}
+
+.text-tiny {
+    font-size: 0.6em;
 }

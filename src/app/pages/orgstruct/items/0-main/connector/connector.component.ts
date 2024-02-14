@@ -1,24 +1,29 @@
-import { Component, Input } from "@angular/core";
-import { BlockComponent } from "../block/block.component";
+import { Component, ContentChildren, QueryList } from "@angular/core";
+import { elementFromRef } from "@utils";
+import { ConnectableDirective } from "./connectable.directive";
 
 @Component({
-    // eslint-disable-next-line @angular-eslint/component-selector
-    selector: "[appConnector]",
+    selector: "app-connector",
     standalone: true,
     imports: [],
     templateUrl: "./connector.component.html",
     styleUrl: "./connector.component.scss",
 })
 export class ConnectorComponent {
-    @Input({ required: true }) from!: BlockComponent;
-    @Input({ required: true }) to!: BlockComponent;
+    @ContentChildren(ConnectableDirective, { descendants: true })
+    readonly connectables?: QueryList<ConnectableDirective>;
 
-    get path() {
-        const fromElement = this.from.containerRef?.nativeElement;
-        const toElement = this.to.containerRef?.nativeElement;
+    getPath({ element, receive, direction, extension }: ConnectableDirective) {
+        const receiverElement = elementFromRef(receive);
+        if (!receiverElement) return "";
 
-        if (!fromElement || !toElement) return "";
+        return this.getPathAttr(element.nativeElement, receiverElement, {
+            direction,
+            extension,
+        });
+    }
 
+    getPathAttr(fromElement: HTMLElement, toElement: HTMLElement, { direction = "horizontal", extension = 1 } = {}) {
         const fromCenter = {
             x: fromElement.offsetLeft + fromElement.offsetWidth / 2,
             y: fromElement.offsetTop + fromElement.offsetHeight / 2,
@@ -35,7 +40,7 @@ export class ConnectorComponent {
         let startX, endX, startY, endY, q1X, q1Y, q2X, q2Y;
 
         // Horizontal
-        if (Math.abs(dx) > Math.abs(dy)) {
+        if (direction === "horizontal") {
             if (dx > 0) {
                 startX = fromElement.offsetLeft + fromElement.offsetWidth;
                 endX = toElement.offsetLeft;
@@ -47,9 +52,9 @@ export class ConnectorComponent {
                 startY = fromCenter.y;
                 endY = toCenter.y;
             }
-            q1X = startX + 0.25 * dx;
+            q1X = startX + 0.25 * extension * dx;
             q1Y = startY;
-            q2X = endX - 0.25 * dx;
+            q2X = endX - 0.25 * extension * dx;
             q2Y = endY;
         } else {
             if (dy > 0) {
@@ -64,9 +69,9 @@ export class ConnectorComponent {
                 endY = toElement.offsetTop + toElement.offsetHeight;
             }
             q1X = startX;
-            q1Y = startY + 0.25 * dy;
+            q1Y = startY + 0.25 * extension * dy;
             q2X = endX;
-            q2Y = endY - 0.25 * dy;
+            q2Y = endY - 0.25 * extension * dy;
         }
 
         endX -= startX;
@@ -75,6 +80,8 @@ export class ConnectorComponent {
         q1Y -= startY;
         q2X -= startX;
         q2Y -= startY;
+
+        if ([startX, startY, endX, endY, q1X, q1Y, q2X, q2Y].some((v) => isNaN(v))) return "";
 
         return `M ${startX} ${startY} c ${q1X} ${q1Y}, ${q2X} ${q2Y}, ${endX} ${endY}`;
     }

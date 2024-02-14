@@ -1,0 +1,16 @@
+.block {
+    padding: 1px 15px;
+    background-color: rgb(0 0 0 / 50%);
+    margin: 2px;
+    border: 2px solid rgb(0 0 0 / 20%);
+
+    &:hover {
+        background-color: rgb(0 0 0 / 70%);
+        border: 2px solid rgb(0 0 0 / 40%);
+    }
+
+    transition: background-color 0.3s, border 0.3s;
+
+    flex-grow: 1;
+    cursor: pointer;
+}

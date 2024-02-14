@@ -1,9 +1,0 @@
-@for (division of divisions(); track $index) {
-    <app-lazy [when]="division()" loadText="Loading division...">
-        <ng-template appLazyTarget>
-
-             <app-division [division]="division()!" (removed)="divisions.remove(division)"></app-division>
-
-        </ng-template>
-    </app-lazy>
-}

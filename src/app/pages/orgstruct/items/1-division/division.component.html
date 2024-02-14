@@ -1,0 +1,17 @@
+<h1><span class="division-letter">{{division.firstLetter}}</span> {{division.fullName}}</h1>
+<p>Detailed description...</p>
+
+<div class="flex">
+    @for (office of division.offices; track $index) {
+
+        <ng-template appCardContent #officeRef=appCardContent [closeable]="true">
+            <app-office [office]="office"></app-office>
+            <div>Hello</div>
+        </ng-template>
+
+
+        <div class="block" (pointerdown)="showOffice(officeRef, blockRef)" #blockRef >
+            <p block-title class="text-center">{{office.name}}</p>
+        </div>
+    }
+</div>
