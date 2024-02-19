@@ -1,11 +1,9 @@
-import { IOffice } from "./office";
-import { IBaseInfo } from "./base-info";
-import { ITask } from "./task";
-import { IProducer } from "./producer";
-import { IProcess } from "./process";
+import type { IOffice } from "./office";
+import type { IBaseInfo } from "./base-info";
+import type { ITask } from "./task";
+import type { IProducer } from "./producer";
 
 export interface IBranch extends IBaseInfo, IProducer {
     office: IOffice;
-    processes: IProcess[];
     tasks: ITask[];
 }

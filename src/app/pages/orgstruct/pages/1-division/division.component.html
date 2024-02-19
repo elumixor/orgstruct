@@ -1,0 +1,23 @@
+<div [appContextMenu]="contextOptions()">
+    <app-editable class="h3"
+                  [(text)]="division.title"></app-editable>
+    <app-editable [(text)]="division.description"></app-editable>
+
+    <div class="flex">
+        <div *appLazyFor="let office of offices?.(); type: 'office'"
+             class="block"
+             (appClick)="cardsManager.push(officeRef, { from: blockRef })"
+             [appContextMenu]="contextOptions(office)"
+             #blockRef>
+
+            <ng-template appCardContent
+                         #officeRef="appCardContent"
+                         [closeable]="true">
+                <app-office [office]="office"></app-office>
+            </ng-template>
+
+            <p block-title
+               class="text-center">{{ office.title }}</p>
+        </div>
+    </div>
+</div>

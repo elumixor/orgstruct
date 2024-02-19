@@ -1,4 +1,4 @@
-import { Routes } from "@angular/router";
+import type { Routes } from "@angular/router";
 import { ItemsComponent, BudgetComponent, OrgstructComponent, PlanComponent } from "./pages";
 
 export const routes: Routes = [

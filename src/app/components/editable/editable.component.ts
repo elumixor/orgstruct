@@ -16,12 +16,10 @@ export class EditableComponent {
     @ViewChild("inputRef") private readonly inputRef?: ElementRef<HTMLInputElement>;
 
     private _text?: string;
-    private previousText?: string;
 
     @Input()
     set text(value: string | undefined) {
         this._text = value;
-        this.previousText = value;
     }
 
     get text() {
@@ -44,7 +42,6 @@ export class EditableComponent {
     }
 
     private sync() {
-        this.previousText = this._text;
         this.textChange.emit(this._text);
     }
 }

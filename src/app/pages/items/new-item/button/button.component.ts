@@ -1,6 +1,6 @@
 import { Component, ElementRef, ViewChild } from "@angular/core";
 import { ImageWithTextComponent } from "@components";
-import { ItemType } from "@domain";
+import type { EntityName } from "@domain";
 import { NetworkService } from "@services/network.service";
 
 @Component({
@@ -32,13 +32,12 @@ export class NewItemButtonComponent {
 
             let targetX = 0;
             let targetY = 0;
-            if (anchorBBox && selfBBox) {
-                const { x, y, width, height } = anchorBBox;
-                const { width: selfWidth, height: selfHeight } = selfBBox;
 
-                targetX = x + width / 2 - selfWidth / 2;
-                targetY = y + height / 2 - selfHeight / 2;
-            }
+            const { x, y, width, height } = anchorBBox;
+            const { width: selfWidth, height: selfHeight } = selfBBox;
+
+            targetX = x + width / 2 - selfWidth / 2;
+            targetY = y + height / 2 - selfHeight / 2;
 
             // Set the position
             this.bar.nativeElement.style.left = targetX + "px";
@@ -46,10 +45,10 @@ export class NewItemButtonComponent {
         }
     }
 
-    create(type: ItemType) {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    create(type: EntityName) {
         // const db = useContext(DBContext);
         // this.network.create(type);
-        console.log("creating " + type);
         // console.log(db);
         // await db?.create(type);
         // await db?.refresh();

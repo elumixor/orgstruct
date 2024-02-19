@@ -1,0 +1,15 @@
+<div [appContextMenu]="contextOptions()">
+    <app-editable class="h3"
+                  [(text)]="branch.title"></app-editable>
+    <app-editable [(text)]="branch.description"></app-editable>
+
+    <h3>Tasks</h3>
+    <ng-container *appLazy="tasks">
+        @for (taskLazy of tasks(); track $index) {
+        <ng-container *appLazy="taskLazy; $value as task">
+            <app-task [task]="task"
+                      [appContextMenu]="contextOptions(task)"></app-task>
+        </ng-container>
+        }
+    </ng-container>
+</div>

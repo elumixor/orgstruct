@@ -13,7 +13,7 @@ export class ConnectorComponent {
     @ContentChildren(ConnectableDirective, { descendants: true })
     readonly connectables?: QueryList<ConnectableDirective>;
 
-    getPath({ element, receive, direction, extension }: ConnectableDirective) {
+    getPath({ element, appConnectable: receive, direction, extension }: ConnectableDirective) {
         const receiverElement = elementFromRef(receive);
         if (!receiverElement) return "";
 

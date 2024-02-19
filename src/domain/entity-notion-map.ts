@@ -1,9 +1,8 @@
-import { ItemKey, ItemObject, ItemType, ItemValue } from "@domain";
-import { Refs2Id } from "@utils";
-import { NotionPropertyDescriptor, SetPropertyRequest } from "../notion";
+import type { Entity, EntityName } from "@domain";
+import type { NotionProperty } from "./notion-properties";
 
-type NotionDatabaseDescriptor<T extends ItemType> = {
-    [P in keyof Required<ItemObject<T>>]: NotionPropertyDescriptor;
+type NotionEntities<T extends EntityName> = {
+    [P in keyof Required<Entity<T>>]: NotionProperty;
 };
 
 const baseProperties = {
@@ -13,8 +12,8 @@ const baseProperties = {
     imageUrl: { type: "image" },
 } as const;
 
-export const notionDatabaseDescriptors: {
-    [K in ItemType]: NotionDatabaseDescriptor<K>;
+export const notionPropertiesMap: {
+    [K in EntityName]: NotionEntities<K>;
 } = {
     division: {
         ...baseProperties,
@@ -29,7 +28,6 @@ export const notionDatabaseDescriptors: {
         ...baseProperties,
         office: { name: "Office", type: "relation", single: true },
         tasks: { name: "Tasks", type: "relation" },
-        processes: { name: "Processes", type: "relation" },
     },
 
     task: {
@@ -64,31 +62,31 @@ export const notionDatabaseDescriptors: {
         person: { name: "Person", type: "relation", single: true },
     },
 };
+export type NotionProperties = typeof notionPropertiesMap;
 
-export const itemsProperties = Object.fromEntries(
-    Object.entries(notionDatabaseDescriptors).map(([itemType, properties]) => [itemType, Object.keys(properties)]),
-) as unknown as {
-    [K in ItemType]: ItemKey<K>[];
-};
+export function notionProperty<T extends EntityName, K extends keyof Entity<T>>(
+    entityName: T,
+    propertyName: K,
+): NotionProperties[T][K] {
+    const properties = notionPropertiesMap[entityName];
+    const property = properties[propertyName];
 
-export function propertyToNotion<T extends ItemType>(itemType: T, propertyName: ItemKey<T>, value?: ItemValue<T>) {
-    const descriptors = notionDatabaseDescriptors[itemType];
-    const descriptor = descriptors[propertyName];
+    if (property.type === "image") throw new Error("Image property is not yet supported");
+    if (property.type === "estimate") throw new Error("Image property is not yet supported");
+    if (property.type === "contacts") throw new Error("Image property is not yet supported");
 
-    if (descriptor.type === "image") throw new Error("Image property is not yet supported");
-    if (descriptor.type === "estimate") throw new Error("Image property is not yet supported");
-    if (descriptor.type === "contacts") throw new Error("Image property is not yet supported");
-    if (!descriptor) throw new Error(`Property ${String(propertyName)} not found`);
-
-    return {
-        name: descriptor.name,
-        type: descriptor.type,
-        value,
-    } as SetPropertyRequest;
+    return property;
 }
 
-export function propertiesToNotion<T extends ItemType>(itemType: T, properties: Partial<Refs2Id<ItemObject<T>>>) {
-    return Object.entries(properties).map(([propertyName, value]) =>
-        propertyToNotion(itemType, propertyName, value as ItemValue<T>),
-    );
+export function notionProperties<T extends EntityName, U extends Partial<Record<keyof Entity<T>, unknown>>>(
+    entityName: T,
+    properties: U,
+) {
+    return Object.entries(properties).map(([propertyName, value]) => {
+        const property = notionProperty(entityName, propertyName as keyof Entity<T>);
+        return {
+            ...property,
+            value,
+        };
+    });
 }

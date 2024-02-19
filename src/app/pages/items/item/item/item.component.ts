@@ -1,6 +1,5 @@
 import { Component, EventEmitter, Input, Output } from "@angular/core";
-import { ItemType } from "@domain";
-import { DBEntry } from "@utils";
+import type { MetaPlain } from "@utils";
 
 @Component({
     selector: "app-item",
@@ -10,7 +9,7 @@ import { DBEntry } from "@utils";
     styleUrl: "./item.component.scss",
 })
 export class ItemComponent {
-    @Input({ required: true }) item!: DBEntry<ItemType>;
+    @Input({ required: true }) item!: MetaPlain;
     @Output() remove = new EventEmitter();
 
     removeVisible = false;

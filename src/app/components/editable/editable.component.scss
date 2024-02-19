@@ -1,14 +1,17 @@
 @use "@styles/colors.scss";
 
-.background {
+@mixin baseStyle {
+    font-size: 1em;
+    padding: 5px 10px;
+    width: calc(100% - 20px);
     transition: all 0.2s ease-in-out;
-
-    &:hover, &.focused {
-        background-color: rgba(0, 0, 0, 0.25);
-        border-radius: 10px;
-        cursor: text;
-    }
 }
+
+@mixin hoverStyle {
+    background-color: rgba(0, 0, 0, 0.25);
+    cursor: text;
+}
+
 
 
 .grow-wrap {
@@ -51,9 +54,15 @@ textarea {
     background-color: transparent;
     border: none;
     outline: none;
-    font-size: 1em;
-    padding: 5px 10px;
-    width: calc(100% - 20px);
-
     overflow-wrap: anywhere;
+
+    @include baseStyle;
+}
+
+label {
+    &:hover, &.focused {
+        .grow-wrap > textarea, .grow-wrap::after {
+            @include hoverStyle;
+        }
+    }
 }

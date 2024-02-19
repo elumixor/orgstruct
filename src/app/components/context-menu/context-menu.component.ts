@@ -1,12 +1,54 @@
-import { ChangeDetectorRef, Component, ElementRef, ViewChild, afterNextRender } from "@angular/core";
-import { IContextMenuOption } from "./context-menu-option";
+import { Component, ElementRef, HostListener, ViewChild } from "@angular/core";
+import { animate, query, stagger, style, transition, trigger } from "@angular/animations";
+import { ClickDirective } from "../click.directive";
+import type { IContextMenuOption } from "./context-menu-option";
 
 @Component({
     selector: "app-context-menu",
     standalone: true,
-    imports: [],
+    imports: [ClickDirective],
     templateUrl: "./context-menu.component.html",
     styleUrl: "./context-menu.component.scss",
+    animations: [
+        trigger("appear", [
+            transition("* => *", [
+                // each time the binding value changes
+                query(
+                    ":leave",
+                    [
+                        stagger("0.1s", [
+                            animate(
+                                "0.2s",
+                                style({ opacity: 0, transform: "translateX(30px) translateY(-10px) rotateY(-10deg)" }),
+                            ),
+                        ]),
+                    ],
+                    { optional: true },
+                ),
+                query(
+                    ":enter",
+                    [
+                        style({
+                            opacity: 0,
+                            transform: "translateX(-30px) translateY(-10px) rotateY(0deg)",
+                        }),
+                        stagger("0.05s", [
+                            animate(
+                                "0.2s ease-in-out",
+                                style({
+                                    opacity: 1,
+                                    transform: "translateX(-10px) translateY(-10px) rotateY(-5deg)",
+                                }),
+                            ),
+                        ]),
+                    ],
+                    {
+                        optional: true,
+                    },
+                ),
+            ]),
+        ]),
+    ],
 })
 export class ContextMenuComponent {
     visible = true;
@@ -17,19 +59,6 @@ export class ContextMenuComponent {
     private _x = 0;
     private _y = 0;
 
-    constructor(changeDetectorRef: ChangeDetectorRef) {
-        afterNextRender(() => {
-            // Register click outside the context menu to close it
-            window.addEventListener("pointerdown", (e) => {
-                const nativeElement = this.containerRef?.nativeElement;
-                if (!nativeElement || !e.composedPath().includes(this.containerRef.nativeElement) || e.button !== 2) {
-                    this.visible = false;
-                    changeDetectorRef.detectChanges();
-                }
-            });
-        });
-    }
-
     get left() {
         return `${this._x}px`;
     }
@@ -39,14 +68,22 @@ export class ContextMenuComponent {
     }
 
     show(x: number, y: number, options: IContextMenuOption[]) {
-        this.visible = true;
         this._x = x;
         this._y = y;
         this.options = options;
+        this.visible = true;
     }
 
     selectOption(option: IContextMenuOption) {
         option.action();
         this.visible = false;
+    }
+
+    @HostListener("window:pointerdown", ["$event"])
+    closeContextMenu(e: PointerEvent) {
+        const nativeElement = this.containerRef?.nativeElement;
+        if (!nativeElement || !e.composedPath().includes(this.containerRef.nativeElement) || e.button !== 2) {
+            this.visible = false;
+        }
     }
 }

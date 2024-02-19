@@ -1,5 +1,5 @@
-import { CreatePageParameters } from "@notionhq/client/build/src/api-endpoints";
-import { MapNotionType } from "./extract-property";
+import type { CreatePageParameters } from "@notionhq/client/build/src/api-endpoints";
+import type { MapNotionType } from "./extract-property";
 
 export function createProperty<T extends keyof MapNotionType>(
     request: SetPropertyRequest<T>,

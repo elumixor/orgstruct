@@ -1,4 +1,15 @@
 {
-    "cSpell.words": ["orgstruct", "resizer"],
+    "cSpell.words": [
+        "connectables",
+        "lazification",
+        "lazified",
+        "Lazify",
+        "orgstruct",
+        "proxified",
+        "Proxifier",
+        "Proxify",
+        "resizer",
+        "supertask"
+    ],
     "editor.detectIndentation": false
 }

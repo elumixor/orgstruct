@@ -1,7 +1,22 @@
 <ng-content></ng-content>
 
-<div class="context-menu fixed white" [style.left]="left" [style.top]="top" [class.visible]="visible">
+@if (visible) {
+<div class="container fixed white"
+     [style.left]="left"
+     [style.top]="top"
+     [@appear]="options.length"
+     #containerRef>
     @for (option of options; track $index) {
-        <div class="option p-10" (pointerdown)="selectOption(option)">{{option.text}}</div>
+    <div class="option flavor-{{option.flavor ?? 'default'}}"
+         (appClick)="selectOption(option)">
+
+        @if (option.icon) {
+        <img [src]="option.icon"
+             alt="icon" />
+        }
+
+        {{option.text}}
+    </div>
     }
 </div>
+}

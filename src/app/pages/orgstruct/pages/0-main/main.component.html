@@ -1,0 +1,55 @@
+<div [appContextMenu]="contextOptions()">
+    <h1>{{companyName}}</h1>
+    <app-editable [text]="description" />
+
+    <br>
+    <h3 class="text-center">Organizational scheme</h3>
+    <br>
+
+    <app-connector>
+
+        <div class="grid">
+            <div #ownerRef
+                 class="block grid-owner">
+                <p block-title
+                   class="text-center">Owner</p>
+            </div>
+
+
+            <div #ceoRef
+                 class="block grid-ceo"
+                 direction="vertical"
+                 [appConnectable]="ownerRef">
+                <p block-title
+                   class="text-center">CEO</p>
+            </div>
+        </div>
+
+
+        <div class="flex justify-center">
+            <div *appLazyFor="let division of data.divisionIds(); type: 'division'; let i = index"
+                 #blockRef
+                 class="block division"
+                 [appConnectable]="i === 0 ? ownerRef : ceoRef"
+                 [direction]="'vertical'"
+                 [appContextMenu]="contextOptions(division)"
+                 (appClick)="cardsManager.push(divisionRef, { from: blockRef })">
+
+                <p class="text-center division-letter">{{division.title[0]}}</p>
+                <p class="text-center text-tiny">{{division.title}}</p>
+
+                <ng-template #divisionRef=appCardContent
+                             appCardContent
+                             [closeable]="true">
+                    <app-division [division]="division" />
+                </ng-template>
+
+
+            </div>
+
+        </div>
+
+        <p class="text-center italic bold small">Divisions</p>
+
+    </app-connector>
+</div>

@@ -1,17 +1,19 @@
 import {
-    AfterViewInit,
+    type AfterViewInit,
     ChangeDetectorRef,
     Component,
     ElementRef,
     NgZone,
+    PLATFORM_ID,
     QueryList,
     ViewChild,
     ViewChildren,
     inject,
 } from "@angular/core";
+import { isPlatformBrowser } from "@angular/common";
 import { CardsManagerComponent } from "./cards-manager/cards-manager.component";
 import { CardContentDirective } from "./cards-manager/card-content.directive";
-import { MainComponent } from "./items/0-main/main.component";
+import { MainComponent } from "./pages/0-main/main.component";
 
 @Component({
     selector: "app-orgstruct",
@@ -23,6 +25,7 @@ import { MainComponent } from "./items/0-main/main.component";
 export class OrgstructComponent implements AfterViewInit {
     private readonly zone = inject(NgZone);
     private readonly changeDetector = inject(ChangeDetectorRef);
+    private readonly platform = inject(PLATFORM_ID);
 
     @ViewChild("backgroundRef") private readonly backgroundRef?: ElementRef<HTMLElement>;
 
@@ -32,10 +35,13 @@ export class OrgstructComponent implements AfterViewInit {
     @ViewChildren(CardContentDirective) private readonly contentDirectives?: QueryList<CardContentDirective>;
 
     ngAfterViewInit() {
+        if (!isPlatformBrowser(this.platform)) return;
+
         this.zone.runOutsideAngular(() => {
             const bg = this.backgroundRef?.nativeElement;
             const fg = this.cardsManagerRef?.nativeElement;
 
+            // Move the cards when the mouse moves
             window.addEventListener(
                 "pointermove",
                 (event) => {
@@ -43,6 +49,16 @@ export class OrgstructComponent implements AfterViewInit {
                     const angleX = (event.clientX / bg.offsetWidth - 0.5) * -20;
                     const angleY = (event.clientY / bg.offsetHeight - 0.5) * 10;
                     fg.style.transform = `translateX(${angleX}px) translateY(${-angleY}px)`;
+                },
+                { passive: true },
+            );
+
+            // Center the cards when the mouse leaves the background
+            document.addEventListener(
+                "pointerleave",
+                () => {
+                    if (!fg) return;
+                    fg.style.transform = "translateX(0px) translateY(0px)";
                 },
                 { passive: true },
             );

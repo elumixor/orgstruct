@@ -1,6 +1,6 @@
 import { Directive, ElementRef, Input } from "@angular/core";
 import { ContextMenuComponent } from "./context-menu.component";
-import { IContextMenuOption } from "./context-menu-option";
+import type { IContextMenuOption } from "./context-menu-option";
 
 @Directive({
     selector: "[appContextMenu]",
@@ -8,7 +8,6 @@ import { IContextMenuOption } from "./context-menu-option";
 })
 export class ContextMenuDirective {
     @Input({ required: true }) appContextMenu: IContextMenuOption[] = [];
-    // @Input() parentContextItems: "inherit" | "ignore" = "inherit";
 
     constructor(contextMenu: ContextMenuComponent, hostElement: ElementRef<HTMLElement>) {
         hostElement.nativeElement.addEventListener("contextmenu", (event: MouseEvent) => {

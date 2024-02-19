@@ -1,11 +1,10 @@
 import * as fs from "fs";
 import * as path from "path";
-import { DatabaseName } from "@domain";
-import { ChildDatabaseBlockObjectResponse, PageObjectResponse } from "@notionhq/client/build/src/api-endpoints";
+import type { NotionName, NotionProperty } from "@domain";
+import type { ChildDatabaseBlockObjectResponse, PageObjectResponse } from "@notionhq/client/build/src/api-endpoints";
 import { Client as NotionClient } from "@notionhq/client";
 import { extractProperties } from "./extract-property";
-import { NotionPropertyDescriptor } from "./property-types";
-import { SetPropertyRequest, createProperties } from "./create-property";
+import { type SetPropertyRequest, createProperties } from "./create-property";
 
 export class NotionApi {
     // Initializing a client
@@ -28,12 +27,12 @@ export class NotionApi {
 
         // Return their titles and ids
         return Object.fromEntries(databases.map(({ id, child_database: { title } }) => [title, id] as const)) as Record<
-            DatabaseName,
+            NotionName,
             string
         >;
     }
 
-    async getPages<T extends Record<string, NotionPropertyDescriptor>>(
+    async getPages<T extends Record<string, NotionProperty>>(
         databaseId: string,
         properties: T = {} as T extends Record<string, never> ? T : never,
     ) {
@@ -45,7 +44,7 @@ export class NotionApi {
         }));
     }
 
-    async getPage<T extends Record<string, NotionPropertyDescriptor>>(pageId: string, properties: T) {
+    async getPage<T extends Record<string, NotionProperty>>(pageId: string, properties: T) {
         const response = await this.notion.pages.retrieve({ page_id: pageId });
         return {
             id: response.id,

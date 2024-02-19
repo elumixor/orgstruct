@@ -1,1 +1,3 @@
-export type Identifier = { id: string };
+export interface Identifier {
+    id: string;
+}

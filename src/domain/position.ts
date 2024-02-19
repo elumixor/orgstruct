@@ -1,7 +1,7 @@
-import { IBaseInfo } from "./base-info";
-import { IPerson } from "./person";
-import { IProcess } from "./process";
-import { ITask } from "./task";
+import type { IBaseInfo } from "./base-info";
+import type { IPerson } from "./person";
+import type { IProcess } from "./process";
+import type { ITask } from "./task";
 
 export interface IPosition extends IBaseInfo {
     tasks?: ITask[];

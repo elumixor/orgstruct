@@ -1,30 +1,49 @@
 @use "@styles/colors.scss";
 
-.context-menu {
-    &:not(.visible) {
-        opacity: 0;
-        transition: opacity 0.1s ease-out;
-        pointer-events: none;
-    }
-
-    opacity: 1;
-
-    transition: opacity 0.2s ease-out;
-
-    box-shadow: 4px 4px 5px rgba(0, 0, 0, 0.5);
-
-    border-radius: 5px;
-    overflow: hidden;
-}
-
 .option {
-    background-color: darken(colors.$grey, 50%);
-
-    cursor: pointer;
-
-    &:hover {
-        background-color: lighten(colors.$grey, 20%);
-    }
+    background-color: rgba(0 0 0 / 50%);
+    border: 1px solid rgba(0 0 0 / 80%);
+    box-shadow: 2px 2px 2px 0 rgba(0 0 0 / 70%);
+    padding: 10px;
+    backdrop-filter: blur(5px);
+    position: relative;
 
     transition: all 0.1s ease-in;
+
+    margin: 2px;
+    left: 0px;
+
+    cursor: pointer;
+    transform: translateX(-10px) translateY(-10px) rotateY(-5deg);
+
+    &:hover {
+        &.flavor {
+            &-default {
+                background-color: rgba(33, 112, 148, 0.2);
+            }
+            &-danger {
+                background-color: rgba(196, 0, 0, 0.452);
+            }
+            &-warning {
+                background-color: rgba(148, 148, 33, 0.2);
+            }
+        }
+
+        left: -2px;
+    }
+}
+
+.wrapper {
+    padding: 5px;
+    margin: -5px;
+
+    &:hover {
+        .option {
+            background-color: rgba(33, 112, 148, 0.2);
+        }
+    }
+}
+
+.container {
+    perspective: 80px;
 }

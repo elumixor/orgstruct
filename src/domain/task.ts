@@ -1,12 +1,12 @@
-import { IAssignable } from "./assignable";
-import { IBaseInfo } from "./base-info";
-import { IBranch } from "./branch";
-import { IEstimable } from "./estimable";
-import { IProcess } from "./process";
-import { IProducer } from "./producer";
+import type { IAssignable } from "./assignable";
+import type { IBaseInfo } from "./base-info";
+import type { IBranch } from "./branch";
+import type { IEstimable } from "./estimable";
+import type { IProcess } from "./process";
+import type { IProducer } from "./producer";
 
 export interface ITask extends IBaseInfo, IProducer, IAssignable, IEstimable {
-    branch?: IBranch;
+    branch: IBranch;
     process?: IProcess;
     supertask?: ITask;
     subtasks?: ITask[];

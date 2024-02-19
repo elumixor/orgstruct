@@ -1,14 +1,15 @@
-<label class="background block" [class.focused]="focused">
-    <div class="grow-wrap" [attr.data-replicated-value]="text">
-        <textarea
-        rows="1" wrap="soft"
-        [(ngModel)]="text"
-        [placeholder]="placeholder"
-        (focus)="focus()"
-        (blur)="blur()"
-        (keydown.escape)="blur()"
-        (input)="onInput($event)"
-        #inputRef
-        ></textarea>
+<label class="background"
+       [class.focused]="focused">
+    <div class="grow-wrap"
+         [attr.data-replicated-value]="text">
+        <textarea rows="1"
+                  wrap="soft"
+                  [(ngModel)]="text"
+                  [placeholder]="placeholder"
+                  (focus)="focus()"
+                  (blur)="blur()"
+                  (keydown.escape)="blur()"
+                  (input)="onInput($event)"
+                  #inputRef></textarea>
     </div>
 </label>

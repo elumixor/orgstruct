@@ -1,12 +1,9 @@
-import { PageObjectResponse } from "@notionhq/client/build/src/api-endpoints";
-import { IContacts, IEstimate, Identifier } from "@domain";
+/* eslint-disable no-console */
+import type { PageObjectResponse } from "@notionhq/client/build/src/api-endpoints";
+import type { IContacts, IEstimate, Identifier, NotionProperty, NotionRelationProperty } from "@domain";
 import { yellow } from "@utils";
-import { NotionPropertyDescriptor, NotionRelationPropertyDescriptor } from "./property-types";
 
-export function extractProperty<T extends NotionPropertyDescriptor>(
-    page: PageObjectResponse,
-    descriptor: T,
-): MapReturnType<T> {
+export function extractProperty<T extends NotionProperty>(page: PageObjectResponse, descriptor: T): MapReturnType<T> {
     type R = MapReturnType<T>;
 
     if (descriptor.type === "image") {
@@ -30,7 +27,6 @@ export function extractProperty<T extends NotionPropertyDescriptor>(
     const { properties } = page;
     const propertyObject = properties[name];
 
-    if (!propertyObject) throw new Error(`Property ${name} not found`);
     if (type !== propertyObject.type)
         throw new Error(`Property ${name} has a wrong type. Actual: ${propertyObject.type}, but requested: ${type}`);
 
@@ -45,12 +41,11 @@ export function extractProperty<T extends NotionPropertyDescriptor>(
     if (propertyObject.type === "number") return propertyObject.number as R;
     if (propertyObject.type === "select") return propertyObject.select as R;
     if (propertyObject.type === "multi_select") return propertyObject.multi_select as { name: string }[] as R;
-    if (propertyObject.type === "date") return propertyObject.date as R;
 
-    throw new Error(`Property ${name} is not yet supported`);
+    return propertyObject.date as R;
 }
 
-export function extractProperties<T extends Record<string, NotionPropertyDescriptor>>(
+export function extractProperties<T extends Record<string, NotionProperty>>(
     result: PageObjectResponse,
     properties: T,
 ): MapProperties<T> {
@@ -59,7 +54,7 @@ export function extractProperties<T extends Record<string, NotionPropertyDescrip
     ) as MapProperties<T>;
 }
 
-export type MapProperties<T extends Record<string, NotionPropertyDescriptor>> = {
+export type MapProperties<T extends Record<string, NotionProperty>> = {
     [P in keyof T]: MapReturnType<T[P]>;
 };
 
@@ -77,7 +72,7 @@ export interface MapNotionType {
     contacts: IContacts;
 }
 
-export type MapReturnType<T extends NotionPropertyDescriptor> = T extends NotionRelationPropertyDescriptor
+export type MapReturnType<T extends NotionProperty> = T extends NotionRelationProperty
     ? T["single"] extends true
         ? Identifier
         : Identifier[]

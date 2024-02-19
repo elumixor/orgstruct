@@ -1,7 +1,11 @@
-import { Public } from "../utils";
+import type { Public } from "../utils";
 
 export type IEstimate = Public<Estimate>;
 
 export class Estimate {
-    constructor(readonly min: number, readonly max = min, readonly avg = (min + max) / 2) {}
+    constructor(
+        readonly min: number,
+        readonly max = min,
+        readonly avg = (min + max) / 2,
+    ) {}
 }

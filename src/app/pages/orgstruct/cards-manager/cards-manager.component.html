@@ -1,23 +1,25 @@
-<div class="offsetter absolute" [style.left]="offset.x + 'px'" [style.top]="offset.y + 'px'">
+<div class="offsetter absolute"
+     [style.left]="offset.x + 'px'"
+     [style.top]="offset.y + 'px'">
     <div class="relative">
         @for (card of cards; track $index) {
-            <div class="content"
-                 [@added]="getAnimation($index)"
-                 [style.pointerEvents]="$index === selected ? 'auto' : 'none'"
-            >
+        <div class="content"
+             [@added]="getAnimation($index)"
+             [style.pointerEvents]="$index === selected ? 'auto' : 'none'">
 
 
-                @if (card.content.closeable) {
-                    <div class="close-button" (pointerdown)="pop()">
-                        <div class="block">
-                            ← Esc
-                        </div>
-                    </div>
-                }
-
-
-                <ng-container [ngTemplateOutlet]="card.content.templateRef"></ng-container>
+            @if (card.content.closeable) {
+            <div class="close-button"
+                 (appClick)="pop()">
+                <div class="block">
+                    ← Esc
+                </div>
             </div>
+            }
+
+
+            <ng-container [ngTemplateOutlet]="card.content.templateRef"></ng-container>
+        </div>
         }
     </div>
 </div>

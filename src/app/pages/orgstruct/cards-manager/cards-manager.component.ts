@@ -1,13 +1,14 @@
 import { Component, HostListener, Input } from "@angular/core";
 import { NgTemplateOutlet } from "@angular/common";
-import { Point, PointArgs, RefProviderOptional, elementFromRef } from "@utils";
+import { Point, type PointArgs, type RefProviderOptional, elementFromRef } from "@utils";
 import { CardContentDirective } from "./card-content.directive";
 import { animations } from "./animations";
+import { ClickDirective } from "@components";
 
 @Component({
     selector: "app-cards-manager",
     standalone: true,
-    imports: [CardContentDirective, NgTemplateOutlet],
+    imports: [CardContentDirective, NgTemplateOutlet, ClickDirective],
     templateUrl: "./cards-manager.component.html",
     styleUrl: "./cards-manager.component.scss",
     animations: [animations],

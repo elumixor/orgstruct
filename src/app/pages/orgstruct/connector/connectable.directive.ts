@@ -1,5 +1,5 @@
 import { Directive, ElementRef, Input, inject } from "@angular/core";
-import { RefProviderOptional } from "@utils";
+import type { RefProviderOptional } from "@utils";
 
 @Directive({
     selector: "[appConnectable]",
@@ -8,7 +8,7 @@ import { RefProviderOptional } from "@utils";
 export class ConnectableDirective {
     readonly element = inject(ElementRef<HTMLElement>) as ElementRef<HTMLElement>;
 
-    @Input({ required: true }) receive!: RefProviderOptional;
+    @Input({ required: true }) appConnectable!: RefProviderOptional;
     @Input() direction: "horizontal" | "vertical" = "horizontal";
     @Input() extension = 1;
 }

@@ -1,10 +1,9 @@
 import { HttpClient } from "@angular/common/http";
 import { Injectable, signal } from "@angular/core";
-import { DatabaseName, Identifier, ItemKey, ItemObject, ItemType } from "@domain";
-import { IRequests } from "@network-api";
-import { DBEntry, Primitive, Refs2Id } from "@utils";
+import type { NotionName, Identifier, EntityName, Entity } from "@domain";
+import type { IRequests } from "@network-api";
+import type { MetaPlain, Plain } from "@utils";
 import { lastValueFrom, tap } from "rxjs";
-import { itemsProperties } from "../../../server/api/property-types";
 
 @Injectable({
     providedIn: "root",
@@ -15,27 +14,30 @@ export class NetworkService implements IRequests {
     constructor(private readonly http: HttpClient) {}
 
     // Requests
-    get<T extends ItemType>(itemType: T, params: Identifier) {
-        return this.post<DBEntry<T>>(`get/${itemType}`, params);
-    }
-    create<T extends ItemType>(itemType: T, params: Refs2Id<ItemObject<T>>) {
-        return this.post<Identifier>(`create/${itemType}`, stripUnneeded(itemType, params));
-    }
-    update<T extends ItemType>(itemType: T, params: Identifier & Partial<Refs2Id<ItemObject<T>>>) {
-        return this.post<void>(`update/${itemType}`, { ...stripUnneeded(itemType, params), id: params.id });
-    }
-    delete<T extends ItemType>(itemType: T, params: Identifier) {
-        return this.post<void>(`delete/${itemType}`, params);
-    }
-    databases() {
-        return this.post<Record<DatabaseName, string>>("databases");
+    get<T extends EntityName>(entityName: T, params: Identifier) {
+        return this.post<MetaPlain<T>>(`get/${entityName}`, { id: params.id });
     }
 
-    async pages<T extends ItemType, P extends ItemKey<T> = ItemKey<T>>(
-        itemType: T,
+    create<T extends EntityName>(entityName: T, params: Plain<T>) {
+        // return this.post<Identifier>(`create/${entityName}`, stripUnneeded(entityName, params));
+        return this.post<Identifier>(`create/${entityName}`, params);
+    }
+    async update<T extends EntityName>(entityName: T, params: Identifier & Partial<Plain<T>>) {
+        // await this.post(`update/${entityName}`, { ...stripUnneeded(entityName, params), id: params.id });
+        await this.post(`update/${entityName}`, params);
+    }
+    async delete<T extends EntityName>(entityName: T, params: Identifier) {
+        await this.post(`delete/${entityName}`, { id: params.id });
+    }
+    databases() {
+        return this.post<Record<NotionName, string>>("databases");
+    }
+
+    async pages<T extends EntityName, P extends keyof Entity<T> = keyof Entity<T>>(
+        entityName: T,
         params: { properties?: P[] } = {},
-    ): Promise<(DBEntry<T> & Identifier & { type: T })[]> {
-        return this.post<(DBEntry<T> & Identifier & { type: T })[]>(`pages/${itemType}`, params);
+    ): Promise<MetaPlain<T>[]> {
+        return this.post<MetaPlain<T>[]>(`pages/${entityName}`, params);
     }
 
     // Helpers
@@ -51,18 +53,18 @@ export class NetworkService implements IRequests {
     }
 }
 
-function stripUnneeded<T extends ItemType, P extends Partial<Refs2Id<ItemObject<T>>>>(itemType: T, params: P) {
-    return Object.fromEntries(
-        itemsProperties[itemType]
-            .filter((property) => Reflect.has(params, property))
-            .map((property) => [property, leaveIdentifier(params[property])] as const),
-    ) as unknown as P;
-}
+// function stripUnneeded<T extends EntityName, P extends Partial<Plain<T>>>(entityName: T, params: P): P {
+//     return Object.fromEntries(
+//         notionPropertiesMap[entityName]
+//             .filter((property) => Reflect.has(params, property))
+//             .map((property) => [property, leaveIdentifier(params[property])] as const),
+//     ) as unknown as P;
+// }
 
-function leaveIdentifier(
-    obj: Record<string, unknown> | Identifier | Primitive | Array<Identifier | Primitive>,
-): Primitive | Identifier | Array<Identifier | Primitive> {
-    if (Array.isArray(obj)) return obj.map(leaveIdentifier) as Array<Identifier | Primitive>;
-    if (typeof obj === "object") return { id: (obj as Identifier).id };
-    return obj as Primitive;
-}
+// function leaveIdentifier(
+//     obj: Record<string, unknown> | Identifier | Primitive | (Identifier | Primitive)[],
+// ): Primitive | Identifier | (Identifier | Primitive)[] {
+//     if (Array.isArray(obj)) return obj.map(leaveIdentifier) as (Identifier | Primitive)[];
+//     if (typeof obj === "object") return { id: (obj as Identifier).id };
+//     return obj as Primitive;
+// }

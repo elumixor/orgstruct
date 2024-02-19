@@ -19,6 +19,7 @@
         "target": "ES2022",
         "module": "ES2022",
         "useDefineForClassFields": false,
+        "verbatimModuleSyntax": true,
         "lib": ["ES2022", "dom"],
         "paths": {
             "@styles/*": ["./src/styles/*"],
@@ -31,13 +32,13 @@
             "@services": ["./src/app/services"],
             "@services/*": ["./src/app/services/*"],
             "@network-api": ["./src/network-api"],
-            "@animations": ["./src/app/animations"],
-        },
+            "@animations": ["./src/app/animations"]
+        }
     },
     "angularCompilerOptions": {
         "enableI18nLegacyMessageIdFormat": false,
         "strictInjectionParameters": true,
         "strictInputAccessModifiers": true,
-        "strictTemplates": true,
-    },
+        "strictTemplates": true
+    }
 }

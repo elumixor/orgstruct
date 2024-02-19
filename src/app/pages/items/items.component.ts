@@ -1,6 +1,6 @@
 import { Component, Input } from "@angular/core";
 import { CenteredContentComponent, SearchBarComponent } from "@components";
-import { Identifier, ItemType } from "@domain";
+import type { Identifier, EntityName } from "@domain";
 // import { search } from "fast-fuzzy";
 import { NetworkService } from "../../services/network.service";
 import { NewItemButtonComponent } from "./new-item/button/button.component";
@@ -38,7 +38,7 @@ export class ItemsComponent {
         // return this.itemCategories.map((type) => [type, items.filter((item) => item.type === type)] as const);
     }
 
-    remove<T extends ItemType>(itemType: T, id: Identifier) {
+    remove<T extends EntityName>(itemType: T, id: Identifier) {
         void this.network.delete(itemType, id);
     }
 }
