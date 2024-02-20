@@ -62,11 +62,10 @@ describe("Api", () => {
         expect(updatedDivision.description).toBe(newDescription);
         expect(updatedDivision.product).toBe(product);
 
-        await api.delete(divisionIdentifier);
+        await api.delete("division", divisionIdentifier);
     });
 
     it("should get tasks", async () => {
-        debugger;
         const tasks = await api.pages("task");
         expect(tasks).toBeInstanceOf(Array);
     }, 100_000);

@@ -1,371 +1,201 @@
-import { Injectable, signal, type Signal, inject } from "@angular/core";
-import type { EntityName, Identifier } from "@domain";
-import { notImplemented, type MetaPlain, type Plain } from "@utils";
+import { Injectable, computed, effect, inject, signal, type Signal, type WritableSignal } from "@angular/core";
+import type { EntityName, Identifier, MetaPlain, Plain } from "@domain";
+import { pick, signalArray } from "@utils";
 import { NetworkService } from "./network.service";
 
-export function idArray() {
-    const sig = signal(undefined as Identifier[] | undefined);
-    const remove = (value: Identifier) => sig.update((items) => items?.filter((item) => item.id !== value.id));
-    const add = (...value: Identifier[]) => sig.update((items) => [...(items ?? []), ...value]);
-    Reflect.defineProperty(sig, "remove", { value: remove });
-    Reflect.defineProperty(sig, "add", { value: add });
-    return sig as typeof sig & {
-        remove: typeof remove;
-        add: typeof add;
-    };
-}
-
-export function linkedArray<T extends EntityName>(
-    entityName: T,
-    initializer: () => Plain<T>,
-    network = inject(NetworkService),
+export function syncArrays<T extends EntityName>(
+    sig: Signal<Lazy<T>[] | undefined>,
+    getArray: () => Identifier[] | undefined,
 ) {
-    const sig = idArray();
+    effect(() => {
+        const signals = sig();
+        const array = getArray();
 
-    const previousAdd = sig.add;
-    const previousRemove = sig.remove;
+        if (!signals) return;
+        if (!array) throw new Error("syncArrays(): Array must be set before offices change");
 
-    const linkedAdd = async () => {
-        const defaultItem = initializer();
-        const id = await network.create(entityName, defaultItem);
-        previousAdd(id);
-    };
-
-    const linkedRemove = (item: Identifier) => {
-        previousRemove(item);
-        void network.delete(entityName, item);
-    };
-
-    Reflect.defineProperty(sig, "linkedAdd", { value: linkedAdd });
-    Reflect.defineProperty(sig, "linkedRemove", { value: linkedRemove });
-
-    return sig as typeof sig & {
-        linkedAdd: typeof linkedAdd;
-        linkedRemove: typeof linkedRemove;
-    };
+        // Add new offices to division.offices or remove the deleted ones
+        array.clear();
+        array.push(...signals.map((sig) => ({ id: sig()?.id ?? "" })));
+    });
 }
-export type LinkedArray<T extends EntityName> = ReturnType<typeof linkedArray<T>>;
 
 @Injectable({
     providedIn: "root",
 })
 export class DataService {
     private readonly network = inject(NetworkService);
-    // private readonly divisions = this.lazyArray("division");
 
-    /**
-     * Takes an identifier, returns a signal that will be initialized with the item from the network request.
-     * Until the network request is resolved, the signal yield `undefined`.
-     */
-    lazyGet<T extends EntityName>(entityName: T, id: Identifier): Signal<MetaPlain<T> | undefined> {
-        const sig = signal(undefined as MetaPlain<T> | undefined);
-        void this.network.get(entityName, id).then((item) => sig.set(item));
-        return sig;
+    /** Creates a new proxy object from the id, will then get the remaining data from the network */
+    from<T extends EntityName>(entityName: T, id: Identifier): Lazy<T>;
+    /** Creates a new proxy object using initial data, creates an object on the backend and then assigns correct id */
+    from<T extends EntityName>(entityName: T, initializer: Plain<T>): Lazy<T>;
+    /** For DX: strange cases where typescript cannot decide */
+    from<T extends EntityName>(entityName: T, idOrInitializer: Identifier | Plain<T>): Lazy<T>;
+    from<T extends EntityName>(entityName: T, idOrInitializer: Identifier | Plain<T>): Lazy<T> {
+        const hasData = !("id" in idOrInitializer);
+        const sig = signal(hasData ? { ...idOrInitializer, id: "", type: entityName } : undefined);
+        let initialized = false;
+        let initializationPromise = new Promise<void>(() => undefined);
+
+        if (hasData)
+            initializationPromise = this.network.create(entityName, idOrInitializer).then((id) => {
+                sig.set({ ...idOrInitializer, ...id, type: entityName });
+            });
+        else
+            initializationPromise = this.network.get(entityName, idOrInitializer).then((item) => {
+                sig.set(item);
+            });
+
+        void initializationPromise.then(() => (initialized = true));
+
+        Reflect.defineProperty(sig, initializedSymbol, { get: () => initialized });
+        Reflect.defineProperty(sig, initializationPromiseSymbol, { get: () => initializationPromise });
+
+        return sig as unknown as Lazy<T>;
     }
 
-    /**
-     * Takes an initial object, asks the network to create it.
-     * Returns a signal that is initialized with the provided values.
-     * When the network request is resolved, the signal is updated with the correct id.
-     */
-    lazyCreate<T extends EntityName>(entityName: T, initializer: Plain<T>): Signal<MetaPlain<T>> {
-        const sig = signal({ ...initializer, id: "", type: entityName } as MetaPlain<T>);
-        void this.network.create(entityName, initializer).then((id) => sig.update((item) => ({ ...item, id })));
-        return sig;
+    lazify<T extends EntityName>(entity: Lazy<T>, { updateTimeout = 1000 } = {}): Lazy<T> {
+        // Return a signal that will proxify the returned value
+        const sig = computed(() => {
+            const value = entity();
+            return value ? proxifyObject(value) : value;
+        });
+
+        // Also return the initialized flag to be compatible with the original Proxy
+        Reflect.defineProperty(sig, initializedSymbol, { get: () => entity[initializedSymbol] });
+        Reflect.defineProperty(sig, initializationPromiseSymbol, { value: entity[initializationPromiseSymbol] });
+
+        // Set of properties that have change and need to be updated on the server
+        const dirtyProperties = new Set<keyof Plain<T>>();
+
+        // Don't update instantly to reduce the number of requests
+        // Update after some time has elapsed (e.g. 1 second) after the latest change
+        let timeoutId = 0;
+
+        // Flag to prevent multiple updates: we only allow an update to happen if the previous one has finished
+        let updateAllowed = true;
+
+        const update = (value: MetaPlain<T>) => {
+            // Don't update if the value was not yet initialized - just record the changes
+            // Also don't update if the previous update is still pending
+            if (!entity[initializedSymbol] || !updateAllowed) {
+                scheduleUpdate(value);
+                return;
+            }
+
+            updateAllowed = false;
+
+            // Actual update
+            void this.network
+                .update(value.type, { id: value.id, ...pick(value, dirtyProperties) })
+                .then(() => (updateAllowed = true));
+
+            dirtyProperties.clear();
+        };
+
+        const scheduleUpdate = (value: MetaPlain<T>) => {
+            window.clearTimeout(timeoutId);
+            timeoutId = window.setTimeout(() => {
+                timeoutId = 0;
+                update(value);
+            }, updateTimeout);
+        };
+
+        const proxifyObject = (obj: MetaPlain<T>): MetaPlain<T> => {
+            return new Proxy(obj, {
+                set(target, prop, newValue) {
+                    // Don't do anything if the value hasn't changed
+                    const oldValue = Reflect.get(target, prop);
+                    if (oldValue === newValue) return true;
+
+                    // Id and type should not be changed
+                    if (prop === "id") throw new Error("Id cannot be updated in the proxy object");
+                    if (prop === "type") throw new Error("Type cannot be updated in the proxy object");
+
+                    // Add the key to the set of dirty properties and schedule an update
+                    dirtyProperties.add(prop as keyof Plain<T>);
+                    scheduleUpdate(target);
+
+                    // Finally, also apply the immediate change to the underlying object
+                    return Reflect.set(target, prop, newValue);
+                },
+                has(target, prop) {
+                    // Provide also initialization symbols
+                    if (prop === initializedSymbol || prop === initializationPromiseSymbol) return true;
+                    return Reflect.has(target, prop);
+                },
+                get(target, prop) {
+                    // Provide also initialization symbols
+                    if (prop === initializedSymbol) return entity[initializedSymbol];
+                    if (prop === initializationPromiseSymbol) return entity[initializationPromiseSymbol];
+                    return Reflect.get(target, prop);
+                },
+            });
+        };
+
+        return sig as Lazy<T>;
     }
 
-    // /**
-    //  * Takes an entity name and returns all items of that type from the network.
-    //  * If an array of identifiers is provided, then takes only those items.
-    //  */
-    // lazyArray<T extends EntityName>(
-    //     entityName: T,
-    //     defaultItem: () => Plain<T>,
-    //     initialIds?: Identifier[],
-    // ): Signal<Signal<MetaPlain<T> | undefined>[] | undefined> & {
-    //     pushFrom(...id: Identifier[]): Signal<MetaPlain<T> | undefined>[];
-    //     addNew(): Signal<MetaPlain<T>>;
-    //     remove(item: Identifier): void;
-    // } {
-    //     const sig = signal(undefined as Signal<MetaPlain<T> | undefined>[] | undefined);
-
-    //     const pushFrom = (...ids: Identifier[]) => {
-    //         // For each id, create a lazyGet signal and push it to the array
-    //         const items = ids.map((id) => this.lazyGet(entityName, id));
-    //         // Update the array with the new items
-    //         sig.update((oldItems) => [...(oldItems ?? []), ...items]);
-    //         return items;
-    //     };
-
-    //     const addNew = () => {
-    //         const item = this.lazyCreate(entityName, defaultItem());
-    //         sig.update((items) => [...(items ?? []), item]);
-    //         return item;
-    //     };
-
-    //     const remove = (item: Identifier) => {
-    //         sig.update((items) => items?.filter((i) => i !== item));
-    //         void this.network.delete(entityName, item);
-    //     };
-
-    //     Reflect.defineProperty(sig, "pushGet", { value: pushFrom });
-    //     Reflect.defineProperty(sig, "pushCreate", { value: addNew });
-    //     Reflect.defineProperty(sig, "remove", { value: remove });
-
-    //     return sig as typeof sig & {
-    //         pushFrom: typeof pushFrom;
-    //         addNew: typeof addNew;
-    //         remove: typeof remove;
-    //     };
-    // }
-
-    creatorFns = {
-        division: this.newDivision.bind(this),
-        office: this.newOffice.bind(this),
-        branch: this.newBranch.bind(this),
-        task: this.newTask.bind(this),
-        get process() {
-            return notImplemented();
-        },
-        get person() {
-            return notImplemented();
-        },
-        get position() {
-            return notImplemented();
-        },
-    } satisfies { [K in EntityName]: (...args: Identifier[]) => Plain<K> };
-
-    // readonly divisionIds = idArray();
-    readonly divisionIds = linkedArray("division", this.creatorFns.division);
-
-    constructor() {
-        void this.network
-            .pages("division", { properties: [] })
-            .then((divisionIds) => this.divisionIds.set(divisionIds));
+    lazifyFrom<T extends EntityName>(entityName: T, idOrInitializer: Identifier | Plain<T>): Lazy<T> {
+        return this.lazify(this.from(entityName, idOrInitializer));
     }
 
-    linkedArray<T extends EntityName>(entityName: T, ...args: Parameters<this["creatorFns"][T]>) {
-        const creatorFn = this.creatorFns[entityName] as (...args: Identifier[]) => Plain<T>;
-        return linkedArray(entityName, () => creatorFn(...(args as unknown as Identifier[])), this.network);
+    lazifyIds<T extends EntityName>(entityName: T, ids: Identifier[]): Lazy<T>[] {
+        return ids.map((id) => this.lazifyFrom(entityName, id));
     }
 
-    delete(entityName: EntityName, id: Identifier) {
-        return this.network.delete(entityName, id);
-    }
+    arrayOfLazy<T extends EntityName>(entityName: T) {
+        // For addition, everything is the same, but we need to override removal in order to delete items on the server
+        const result = signalArray<Lazy<T>>();
 
-    // Alias for DX
-    create<T extends EntityName>(entityName: T, initializer: Plain<T>) {
-        return this.network.create(entityName, initializer);
-    }
+        const previousRemove = result.remove;
 
-    newDivision(): Plain<"division"> {
-        return {
-            title: "New division",
-            description: "Description of the division",
-            product: "Final Valuable Product that the division produces",
-            offices: [],
+        const remove = async (value: Identifier | Lazy<T>) => {
+            if (Reflect.has(value, initializationPromiseSymbol)) await Reflect.get(value, initializationPromiseSymbol);
+
+            // If we have an identifier, then we should already have a valid proxy for it
+            if ("id" in value) {
+                if (value.id === "")
+                    throw new Error("Received an empty id during removal. Maybe try providing a proxy directly?");
+
+                const proxy = result().find((proxy) => proxy()?.id === value.id);
+                if (!proxy)
+                    throw new Error(
+                        `Proxy not found for the given id.\nIds \n\t${result()
+                            .map((proxy) => proxy()?.id)
+                            .join("\n\t")}\ndid not contain id ${String(value.id)}`,
+                    );
+
+                // Remove from array
+                previousRemove(proxy);
+
+                // Also remove from the server
+                return this.network.delete(entityName, value);
+            }
+
+            // Otherwise the situation is a bit more complex: we are removing a proxy directly
+            // Which can be uninitialized, in which case we need to wait for the initialization to finish
+
+            // First, we still just remove it from the array
+            previousRemove(value);
+
+            // Then we remove it from the server, but only if after the initialization is finished
+            void value[initializationPromiseSymbol].then(() => this.network.delete(entityName, value()!));
+        };
+
+        Reflect.defineProperty(result, "remove", { value: remove, writable: true });
+
+        return result as unknown as WritableSignal<Lazy<T>[] | undefined> & {
+            add: (...value: Lazy<T>[]) => void;
+            remove: typeof remove;
         };
     }
-
-    newOffice(division: Identifier): Plain<"office"> {
-        return {
-            title: "New office",
-            description: "Description of the office",
-            product: "Final Valuable Product that the office produces",
-            division,
-            branches: [],
-        };
-    }
-
-    newBranch(office: Identifier): Plain<"branch"> {
-        return {
-            title: "New branch",
-            description: "Description of the branch",
-            product: "Final Valuable Product that the branch produces",
-            office,
-            tasks: [],
-        };
-    }
-
-    newTask(branch: Identifier): Plain<"task"> {
-        return {
-            title: "New task",
-            description: "Description of the task",
-            product: "Final Valuable Product that the task produces",
-            branch,
-        };
-    }
-
-    // // Takes an identifier, returns a signal that will be initialized with the item from the network request
-    // lazyGet<T extends ItemType>(
-    //     type: T,
-    //     id: Identifier,
-    //     {
-    //         initializer,
-    //         autoInitialize = true,
-    //     }: { initializer?: Initializer<ItemObject<T>>; autoInitialize?: boolean } = {},
-    // ): Lazy<ItemObject<T> & Identifier & { type: T }> {
-    //     // If initial value is provided, replace arrays with lazy collections
-    //     const replaced = initializer ? this.replaceArraysWithLazyCollections(initializer, []) : undefined;
-    //     const withIdAndType = replaced ? { ...replaced, ...id, type } : undefined;
-    //     const s = signal(withIdAndType);
-
-    //     if (autoInitialize)
-    //         void (async () => {
-    //             const item = await this.network.get(type, id);
-    //             // const replaced = this.replaceArraysWithLazyCollections
-    //             // s.set(this.proxify(item));
-    //             s.set(this.proxify(item) as unknown as LazifiedFields<ItemObject<T>> & Identifier & { type: T });
-    //         })();
-
-    //     return s as Lazy<ItemObject<T> & Identifier & { type: T }>;
-    // }
-
-    // replaceArraysWithLazyCollections<T, Ctx extends unknown[]>(
-    //     initializer: Initializer<T, Ctx>,
-    //     context: Ctx,
-    // ): LazifiedFields<T> {
-    //     // First, we create a copy of the initial value
-    //     const result = { ...initializer.value } as LazifiedFields<T>;
-
-    //     // Then, we go through all the fields and replace arrays with lazy collections
-    //     if ("initializers" in initializer) {
-    //         const nextContext = [result, ...context] as [T, ...Ctx];
-    //         for (const [key, value] of Object.entries(initializer.initializers)) {
-    //             const { type, initializer: nextInitializer } = value(...nextContext);
-    //             // @ts-expect-error - TS doesn't understand that `key` is a key of `T`
-    //             result[key] = this.lazyArray(type, {
-    //                 initializer: nextInitializer,
-    //             });
-    //         }
-    //     }
-
-    //     return result;
-    // }
-
-    // lazyCreate<T extends ItemType>(
-    //     type: T,
-    //     initializer: Initializer<ItemObject<T>>,
-    // ): Lazy<ItemObject<T> & Identifier & { type: T }> {
-    //     const arrayKeys = "initializers" in initializer ? Object.keys(initializer.initializers) : [];
-    //     const replaced = this.replaceArraysWithLazyCollections(initializer, []);
-    //     const withIdAndType = { ...replaced, type, id: "" };
-    //     const item = signal(withIdAndType);
-
-    //     function refs2id<TT>(value: TT): Refs2Id<TT> {
-    //         return Object.fromEntries(
-    //             Object.entries(value).map(([key, value]) => [
-    //                 key,
-    //                 Array.isArray(value)
-    //                     ? value.map(refs2id)
-    //                     : value && typeof value === "object" && "id" in value
-    //                       ? { id: value.id }
-    //                       : value,
-    //             ]),
-    //         ) as Refs2Id<TT>;
-    //     }
-
-    //     void this.network
-    //         .create(
-    //             type,
-    //             refs2id({
-    //                 ...initializer.value,
-    //                 ...Object.fromEntries(arrayKeys.map((key) => [key, []])),
-    //             } as unknown as ItemObject<T>),
-    //         )
-    //         .then(({ id }) => (item()!.id = id));
-
-    //     return item as Lazy<ItemObject<T> & Identifier & { type: T }>;
-    // }
-
-    // lazyArray<T extends ItemType, TInitializer extends Initializer<ItemObject<T>>>(
-    //     type: T,
-    //     options: {
-    //         ids?: Identifier[];
-    //         initializer: TInitializer;
-    //     },
-    // ): LazyArray<ItemObject<T>> {
-    //     type R = Lazy<ItemObject<T> & Identifier & { type: T }>;
-    //     const s = signal(undefined as R[] | undefined);
-
-    //     if (options.ids) s.set(options.ids.map((id) => this.lazyGet(type, id)));
-    //     else void this.network.pages(type, {}).then((ids) => s.set(ids.map((id) => this.lazyGet(type, id))));
-
-    //     async function waitForId(item: R): Promise<string> {
-    //         await delayUntil(() => {
-    //             const id = item()?.id;
-    //             return id !== undefined && id !== "";
-    //         });
-
-    //         return item()!.id as string;
-    //     }
-
-    //     const add = () => {
-    //         const initializer = options.initializer;
-    //         const item = this.lazyCreate(type, initializer);
-    //         s.update((objects) => [...(objects ?? []), item]);
-    //     };
-
-    //     const remove = async (item: R | Identifier) => {
-    //         s.update((items) => items?.filter((i) => i !== item));
-    //         const id = "id" in item ? item.id : await waitForId(item);
-    //         void this.network.delete(type, { id });
-    //     };
-
-    //     Reflect.set(s, "add", add);
-    //     Reflect.set(s, "remove", remove);
-
-    //     return s as unknown as LazyArray<ItemObject<T>>;
-    // }
-
-    // /** Wraps an object with a proxy that tracks dirty properties and then sends update requests back to the server */
-    // proxify<T extends ItemType>(object: DBEntry<T>, { updateTimeout = 1000 } = {}) {
-    //     type Key = keyof DBEntry<T>;
-
-    //     const dirtyProperties = new Set<Key>();
-    //     let timeoutId = 0;
-
-    //     const update = () => {
-    //         if (object.id === "") {
-    //             scheduleUpdate();
-    //             return;
-    //         }
-
-    //         void this.network.update<T>(object.type, {
-    //             id: object.id,
-    //             ...(Object.fromEntries([...dirtyProperties.values()].map((p) => [p, object[p]])) as unknown as Partial<
-    //                 Refs2Id<ItemObject<T>>
-    //             >),
-    //         });
-
-    //         dirtyProperties.clear();
-    //     };
-
-    //     const scheduleUpdate = () => {
-    //         timeoutId = window.setTimeout(() => {
-    //             timeoutId = 0;
-    //             update();
-    //         }, updateTimeout);
-    //     };
-
-    //     return new Proxy(object, {
-    //         set(target, prop, value) {
-    //             const oldValue = Reflect.get(target, prop);
-    //             if (oldValue === value) return true;
-
-    //             if (prop === "id") {
-    //                 Reflect.set(target, prop, value);
-    //                 return true;
-    //             }
-
-    //             dirtyProperties.add(prop as Key);
-
-    //             if (timeoutId !== 0) window.clearTimeout(timeoutId);
-
-    //             scheduleUpdate();
-
-    //             return Reflect.set(target, prop, value);
-    //         },
-    //     });
-    // }
 }
+
+export type Lazy<T extends EntityName> = Signal<MetaPlain<T> | undefined> & {
+    [initializedSymbol]: boolean;
+    [initializationPromiseSymbol]: Promise<void>;
+};
+export const initializedSymbol = Symbol("initialized");
+export const initializationPromiseSymbol = Symbol("initializationPromise");

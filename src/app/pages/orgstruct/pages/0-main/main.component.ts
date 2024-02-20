@@ -6,13 +6,11 @@ import {
     LazyForDirective,
     type IContextMenuOption,
 } from "@components";
-import { DataService } from "@services";
-import type { MetaPlain } from "@utils";
-import { CardContentDirective } from "../../cards-manager/card-content.directive";
-import { CardsManagerComponent } from "../../cards-manager/cards-manager.component";
-import { ConnectableDirective } from "../../connector/connectable.directive";
-import { ConnectorComponent } from "../../connector/connector.component";
+import { DataService, NetworkService, type Lazy } from "@services";
+import { CardContentDirective, CardsManagerComponent } from "../../cards-manager";
+import { ConnectableDirective, ConnectorComponent } from "../../connector";
 import { DivisionComponent } from "../1-division/division.component";
+import { newDivision } from "@domain";
 
 @Component({
     selector: "app-main",
@@ -31,17 +29,26 @@ import { DivisionComponent } from "../1-division/division.component";
     styleUrl: "./main.component.scss",
 })
 export class MainComponent {
-    readonly data = inject(DataService);
+    private readonly network = inject(NetworkService);
+    private readonly data = inject(DataService);
     readonly cardsManager = inject(CardsManagerComponent);
+
+    readonly divisions = this.data.arrayOfLazy("division");
+
+    constructor() {
+        void this.network
+            .pages("division", { properties: [] })
+            .then((divisionIds) => this.divisions.set(this.data.lazifyIds("division", divisionIds)));
+    }
 
     companyName = "Ishta Gaming";
     description = "We free";
 
-    contextOptions(division?: MetaPlain<"division">) {
+    contextOptions(division?: Lazy<"division">) {
         const options: IContextMenuOption[] = [
             {
                 text: "Add division",
-                action: () => this.data.divisionIds.linkedAdd(),
+                action: () => this.divisions.add(this.data.lazifyFrom("division", newDivision())),
             },
         ];
 
@@ -49,7 +56,7 @@ export class MainComponent {
             options.push({
                 text: "Remove division",
                 flavor: "danger",
-                action: () => this.data.divisionIds.linkedRemove(division),
+                action: () => this.divisions.remove(division),
             });
         }
 

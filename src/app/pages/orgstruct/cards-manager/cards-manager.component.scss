@@ -70,6 +70,7 @@
     padding: 35px 35px;
 
     border: 1px solid rgba(0, 0, 0, 0.2);
+    border-radius: 5px;
 
     @include background;
     @include darkening(0, 0);

@@ -1,5 +1,5 @@
 import { Component, EventEmitter, Input, Output } from "@angular/core";
-import type { MetaPlain } from "@utils";
+import type { MetaPlain } from "@domain";
 
 @Component({
     selector: "app-item",

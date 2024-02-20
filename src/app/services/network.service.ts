@@ -1,8 +1,8 @@
 import { HttpClient } from "@angular/common/http";
-import { Injectable, signal } from "@angular/core";
-import type { NotionName, Identifier, EntityName, Entity } from "@domain";
+import { Injectable, inject, signal } from "@angular/core";
+import type { NotionName, Identifier, EntityName, Entity, MetaPlain, Plain } from "@domain";
 import type { IRequests } from "@network-api";
-import type { MetaPlain, Plain } from "@utils";
+import { cyan, magenta } from "@utils";
 import { lastValueFrom, tap } from "rxjs";
 
 @Injectable({
@@ -11,7 +11,7 @@ import { lastValueFrom, tap } from "rxjs";
 export class NetworkService implements IRequests {
     readonly currentError = signal<string | undefined>(undefined);
 
-    constructor(private readonly http: HttpClient) {}
+    private readonly http = inject(HttpClient);
 
     // Requests
     get<T extends EntityName>(entityName: T, params: Identifier) {
@@ -22,7 +22,10 @@ export class NetworkService implements IRequests {
         // return this.post<Identifier>(`create/${entityName}`, stripUnneeded(entityName, params));
         return this.post<Identifier>(`create/${entityName}`, params);
     }
-    async update<T extends EntityName>(entityName: T, params: Identifier & Partial<Plain<T>>) {
+    async update<T extends EntityName, K extends keyof Plain<T>>(
+        entityName: T,
+        params: Identifier & Pick<Plain<T>, K>,
+    ) {
         // await this.post(`update/${entityName}`, { ...stripUnneeded(entityName, params), id: params.id });
         await this.post(`update/${entityName}`, params);
     }
@@ -41,15 +44,23 @@ export class NetworkService implements IRequests {
     }
 
     // Helpers
-    private post<T = unknown>(path: string, params?: Record<string, unknown>) {
-        return lastValueFrom(
+    private async post<T = unknown>(path: string, params?: Record<string, unknown>) {
+        // eslint-disable-next-line no-console
+        console.log(cyan(`API request: ${path}`), params);
+
+        const result = (await lastValueFrom(
             this.http.post(`/api/${path}`, params).pipe(
                 tap({
                     error: (e: { error?: { message?: string } }) =>
                         this.currentError.set(e.error?.message ?? "Unknown error"),
                 }),
             ),
-        ) as Promise<T>;
+        )) as Promise<T>;
+
+        // eslint-disable-next-line no-console
+        console.log(magenta(`API Response: ${path}`), result);
+
+        return result;
     }
 }
 

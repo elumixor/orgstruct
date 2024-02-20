@@ -1,13 +1,53 @@
-import { Directive, Input, TemplateRef, ViewContainerRef, inject, type OnInit, EmbeddedViewRef } from "@angular/core";
-import type { EntityName, Identifier } from "@domain";
-import { NetworkService } from "@services";
-import { all, type MetaPlain } from "@utils";
+import {
+    Component,
+    ComponentRef,
+    Directive,
+    Input,
+    TemplateRef,
+    ViewContainerRef,
+    effect,
+    inject,
+    type OnInit,
+} from "@angular/core";
+import type { EntityName } from "@domain";
+import type { Lazy } from "@services";
+import type { MetaPlain } from "@domain";
 
 export class LazyForOfContext<T extends EntityName> {
     constructor(
         readonly $implicit: MetaPlain<T>,
+        readonly proxy: Lazy<T>,
         readonly index: number,
     ) {}
+}
+
+@Component({ template: "" })
+export class ProxyComponent<T extends EntityName> {
+    private readonly viewContainer = inject(ViewContainerRef);
+
+    @Input({ required: true }) proxy!: Lazy<T>;
+    @Input({ required: true }) index!: number;
+    @Input({ required: true }) template!: TemplateRef<LazyForOfContext<T>>;
+    @Input({ required: true }) loadingTemplate!: TemplateRef<unknown>;
+
+    constructor() {
+        effect(() => this.render());
+    }
+
+    private render() {
+        const currentValue = this.proxy();
+        if (!currentValue) {
+            this.viewContainer.clear();
+            this.viewContainer.createEmbeddedView(this.loadingTemplate);
+            return;
+        }
+
+        this.viewContainer.clear();
+        this.viewContainer.createEmbeddedView(
+            this.template,
+            new LazyForOfContext(currentValue, this.proxy, this.index),
+        );
+    }
 }
 
 @Directive({
@@ -17,77 +57,73 @@ export class LazyForOfContext<T extends EntityName> {
 export class LazyForOfDirective<T extends EntityName> implements OnInit {
     private readonly viewContainer = inject(ViewContainerRef);
     private readonly template = inject(TemplateRef<LazyForOfContext<T>>);
-    private readonly network = inject(NetworkService);
 
-    private ids?: Identifier[];
-    private items?: MetaPlain<T>[];
+    private proxies?: Lazy<T>[];
     private type?: T;
-    private currentViews = new Map<string, EmbeddedViewRef<unknown>>();
+    private currentViews: ComponentRef<ProxyComponent<T>>[] = [];
+    private isFirstLoad = true;
 
     @Input() appLazyForLoading?: TemplateRef<unknown>;
     @Input() appLazyForLoadingSingle?: TemplateRef<unknown>;
 
     @Input() set appLazyForType(value: T) {
         this.type = value;
-        if (this.ids) void this.update(value, this.ids);
+        if (this.proxies) this.update();
     }
-    @Input() set appLazyForOf(ids: Identifier[] | undefined) {
-        this.ids = ids;
-        if (this.type && ids) void this.update(this.type, ids);
+    @Input() set appLazyForOf(ids: Lazy<T>[] | undefined) {
+        this.proxies = ids;
+        if (this.type && ids) this.update();
     }
 
     ngOnInit() {
-        this.render();
+        this.update();
     }
 
-    private async update(type: T, ids: Identifier[]) {
-        const oldItems = (this.items ?? []).filter((item) => ids.some((id) => id.id === item.id));
-        const newIds = ids.filter((id) => !oldItems.some((item) => item.id === id.id));
-        const newItems = await all(...newIds.map((id) => this.network.get(type, id)));
-        this.items = [...oldItems, ...newItems];
-        this.render();
-    }
-
-    private render() {
-        if (this.items) {
-            this.renderItems(this.items);
+    private update() {
+        if (!this.proxies || !this.type) {
+            this.viewContainer.clear();
+            if (this.appLazyForLoading) this.viewContainer.createEmbeddedView(this.appLazyForLoading);
             return;
         }
 
-        if (this.ids && this.appLazyForLoadingSingle) {
-            this.renderIndividualLoading(this.ids, this.appLazyForLoadingSingle);
-            return;
+        // We need to remove the remaining loading template
+        if (this.isFirstLoad) {
+            this.isFirstLoad = false;
+            this.viewContainer.clear();
         }
 
-        if (this.appLazyForLoading) this.renderAllLoading(this.appLazyForLoading);
-    }
+        // Remove all the components that have a different proxy
+        const outdated = this.currentViews.filter(
+            (proxyComponent) => !this.proxies?.some((proxy) => proxy === proxyComponent.instance.proxy),
+        );
 
-    private renderItems(items: MetaPlain<T>[]) {
-        for (const [index, item] of items.entries()) {
-            const view =
-                this.currentViews.get(item.id) ??
-                this.viewContainer.createEmbeddedView(this.template, new LazyForOfContext<T>(item, index));
-
-            this.viewContainer.insert(view);
-            this.currentViews.set(item.id, view);
+        for (const proxyComponent of outdated) {
+            proxyComponent.destroy();
+            this.currentViews.remove(proxyComponent);
         }
 
-        for (const [id, view] of this.currentViews) {
-            if (items.some((item) => item.id === id)) continue;
+        // Add the new proxies
+        const newProxies = this.proxies.filter(
+            (proxy) => !this.currentViews.some((proxyComponent) => proxyComponent.instance.proxy === proxy),
+        );
 
-            this.viewContainer.remove(this.viewContainer.indexOf(view));
-            this.currentViews.delete(id);
+        let lastIndex = this.currentViews.length;
+        for (const proxy of newProxies) {
+            this.currentViews.push(this.createProxyComponent(proxy, lastIndex));
+            lastIndex++;
         }
+
+        // Update the current views with the new context
+        for (let i = 0; i < this.currentViews.length; i++) this.currentViews[i].setInput("index", i);
     }
 
-    private renderIndividualLoading(ids: Identifier[], individualLoading: TemplateRef<unknown>) {
-        this.viewContainer.clear();
-        for (const id of ids) this.viewContainer.createEmbeddedView(individualLoading, { id });
-    }
-
-    private renderAllLoading(allLoading: TemplateRef<unknown>) {
-        this.viewContainer.clear();
-        this.viewContainer.createEmbeddedView(allLoading);
+    private createProxyComponent(proxy: Lazy<T>, index: number) {
+        const proxyRef = this.viewContainer.createComponent(ProxyComponent<T>);
+        proxyRef.setInput("proxy", proxy);
+        proxyRef.setInput("template", this.template);
+        proxyRef.setInput("index", index);
+        proxyRef.setInput("loadingTemplate", this.appLazyForLoadingSingle);
+        return proxyRef;
     }
 
     static ngTemplateContextGuard<T extends EntityName>(

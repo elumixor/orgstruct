@@ -6,12 +6,11 @@ import {
     LazyForDirective,
     type IContextMenuOption,
 } from "@components";
-import type { MetaPlain } from "@utils";
+import { newOffice, type MetaPlain } from "@domain";
+import { DataService, syncArrays, type Lazy } from "@services";
 import { CardContentDirective } from "../../cards-manager/card-content.directive";
 import { CardsManagerComponent } from "../../cards-manager/cards-manager.component";
 import { OfficeComponent } from "../2-office/office.component";
-import { DataService, type LinkedArray } from "@services";
-import type { Identifier } from "@domain";
 
 @Component({
     selector: "app-division",
@@ -29,35 +28,38 @@ import type { Identifier } from "@domain";
     styleUrl: "./division.component.scss",
 })
 export class DivisionComponent {
+    readonly cardsManager = inject(CardsManagerComponent);
     private readonly data = inject(DataService);
 
-    private _division?: MetaPlain<"division">;
-    offices?: LinkedArray<"office">;
+    readonly offices = this.data.arrayOfLazy("office");
+
+    private _division!: MetaPlain<"division">;
+
+    constructor() {
+        syncArrays(this.offices, () => this._division.offices);
+    }
 
     @Input({ required: true }) set division(value: MetaPlain<"division">) {
         this._division = value;
-        this.offices = this.data.linkedArray("office", value);
-        this.offices.add(...value.offices);
+        this.offices.set(this.data.lazifyIds("office", value.offices));
     }
 
     get division() {
-        return this._division!;
+        return this._division;
     }
 
-    readonly cardsManager = inject(CardsManagerComponent);
-
-    contextOptions(office?: MetaPlain<"office">) {
+    contextOptions(office?: Lazy<"office">) {
         const options: IContextMenuOption[] = [
             {
                 text: "Add office",
-                action: () => this.offices?.linkedAdd(),
+                action: () => this.offices.add(this.data.lazifyFrom("office", newOffice(this.division))),
             },
         ];
         if (office) {
             options.push({
                 text: "Remove office",
                 flavor: "danger",
-                action: () => this.offices?.linkedRemove(office),
+                action: () => this.offices.remove(office),
             });
         }
         return options;

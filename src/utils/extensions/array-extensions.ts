@@ -139,6 +139,10 @@ declare global {
          * @returns The modified array
          */
         shuffle(): this;
+        /**
+         * Clears the array
+         */
+        clear(): void;
     }
 }
 
@@ -393,4 +397,11 @@ Reflect.defineProperty(Array.prototype, "count", {
         for (const arrayElement of this) if (arrayElement === element) total++;
         return total;
     },
+});
+
+Reflect.defineProperty(Array.prototype, "clear", {
+    value(this: unknown[]) {
+        this.splice(0, this.length);
+    },
+    configurable: true,
 });

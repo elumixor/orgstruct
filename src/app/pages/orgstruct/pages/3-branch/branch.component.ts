@@ -1,44 +1,36 @@
 import { Component, Input, inject } from "@angular/core";
-import { ContextMenuDirective, EditableComponent, LazyDirective, type IContextMenuOption } from "@components";
+import { ContextMenuDirective, EditableComponent, LazyForDirective, type IContextMenuOption } from "@components";
 import { TaskComponent } from "../../items/task/task.component";
-import { DataService, type LazyCollection } from "@services";
-import type { MetaPlain } from "@utils";
+import { DataService, type Lazy } from "@services";
+import { newTask, type MetaPlain } from "@domain";
 
 @Component({
     selector: "app-branch",
     standalone: true,
-    imports: [ContextMenuDirective, TaskComponent, EditableComponent, LazyDirective],
+    imports: [ContextMenuDirective, TaskComponent, EditableComponent, LazyForDirective],
     templateUrl: "./branch.component.html",
     styleUrl: "./branch.component.scss",
 })
 export class BranchComponent {
-    private readonly proxy = inject(DataService);
+    private readonly data = inject(DataService);
+    readonly tasks = this.data.arrayOfLazy("task");
 
-    private _branch?: MetaPlain<"branch">;
-
-    tasks?: LazyCollection<"task">;
+    private _branch!: MetaPlain<"branch">;
 
     @Input({ required: true }) set branch(value: MetaPlain<"branch">) {
         this._branch = value;
-        this.tasks = this.proxy.lazyArray("task", {
-            initializer: {
-                branch: { id: value.id },
-                title: "New task",
-                description: "Description of the task",
-                product: "Final Valuable Product that the task produces",
-            },
-        });
+        this.tasks.set(this.data.lazifyIds("task", value.tasks));
     }
 
     get branch() {
-        return this._branch!;
+        return this._branch;
     }
 
-    contextOptions(task?: MetaPlain<"task">) {
+    contextOptions(task?: Lazy<"task">) {
         const options: IContextMenuOption[] = [
             {
                 text: "Add task",
-                action: () => this.tasks?.add(),
+                action: () => this.tasks.add(this.data.lazifyFrom("task", newTask(this.branch))),
             },
         ];
 
@@ -46,7 +38,7 @@ export class BranchComponent {
             options.push({
                 text: "Remove task",
                 flavor: "danger",
-                action: () => this.tasks?.remove(task),
+                action: () => this.tasks.remove(task),
             });
         }
 

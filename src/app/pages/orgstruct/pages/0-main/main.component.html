@@ -27,12 +27,17 @@
 
 
         <div class="flex justify-center">
-            <div *appLazyFor="let division of data.divisionIds(); type: 'division'; let i = index"
+            <div *appLazyFor="let division of divisions();
+                              type: 'division';
+                              loading: loadingRef;
+                              loadingSingle: loadingRef;
+                              let divisionProxy = proxy;
+                              let i = index"
                  #blockRef
                  class="block division"
                  [appConnectable]="i === 0 ? ownerRef : ceoRef"
                  [direction]="'vertical'"
-                 [appContextMenu]="contextOptions(division)"
+                 [appContextMenu]="contextOptions(divisionProxy)"
                  (appClick)="cardsManager.push(divisionRef, { from: blockRef })">
 
                 <p class="text-center division-letter">{{division.title[0]}}</p>
@@ -43,9 +48,13 @@
                              [closeable]="true">
                     <app-division [division]="division" />
                 </ng-template>
-
-
             </div>
+
+            <ng-template #loadingRef>
+                <div>
+                    Loading...
+                </div>
+            </ng-template>
 
         </div>
 

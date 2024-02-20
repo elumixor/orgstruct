@@ -45,10 +45,12 @@ export class NotionApi {
     }
 
     async getPage<T extends Record<string, NotionProperty>>(pageId: string, properties: T) {
-        const response = await this.notion.pages.retrieve({ page_id: pageId });
+        const response = (await this.notion.pages.retrieve({ page_id: pageId })) as PageObjectResponse;
+        if (response.archived) throw new Error("Page is archived");
+
         return {
             id: response.id,
-            ...extractProperties(response as PageObjectResponse, properties),
+            ...extractProperties(response, properties),
         };
     }
 

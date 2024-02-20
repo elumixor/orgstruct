@@ -1,27 +1,25 @@
-<!-- <div [appContextMenu]="contextOptions()">
+<div [appContextMenu]="contextOptions()">
     <app-editable class="h3"
                   [(text)]="office.title"></app-editable>
     <app-editable [(text)]="office.description"></app-editable>
 
     <div class="flex">
-        <ng-container *appLazy="branches">
-            @for (branchLazy of branches(); track $index) {
-            <ng-container *appLazy="branchLazy; $value as branch">
-                <ng-template appCardContent
-                             #branchRef="appCardContent"
-                             [closeable]="true">
-                    <app-branch [branch]="branch"></app-branch>
-                </ng-template>
+        <div *appLazyFor="let branch of branches(); type: 'branch'; let branchProxy = proxy;"
+             class="block"
+             (appClick)="cardsManager.push(branchRef, { from: blockRef })"
+             [appContextMenu]="contextOptions(branchProxy)"
+             #blockRef>
 
-                <div class="block"
-                     (appClick)="showBranch(branchRef, blockRef)"
-                     [appContextMenu]="contextOptions(branch)"
-                     #blockRef>
-                    <p block-title
-                       class="text-center">{{ branch.title }}</p>
-                </div>
-            </ng-container>
-            }
-        </ng-container>
+            <p block-title
+               class="text-center">{{ branch.title }}</p>
+
+
+            <ng-template appCardContent
+                         #branchRef="appCardContent"
+                         [closeable]="true">
+                <app-branch [branch]="branch"></app-branch>
+            </ng-template>
+
+        </div>
     </div>
-</div> -->
+</div>

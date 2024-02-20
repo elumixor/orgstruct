@@ -1,5 +1,6 @@
-import type { Identifier, Entity, EntityName } from "../domain";
-import type { Primitive } from "./primitive";
+import type { Primitive } from "@utils";
+import type { EntityName, Entity } from "./entity-names-map";
+import type { Identifier } from "./identifier";
 
 // Maps an object to identifier, unless it is an array.
 // If it is an array, keeps it an array, but applies the mapping to the inner elements, recursively.

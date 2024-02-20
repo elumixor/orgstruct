@@ -1,10 +1,11 @@
 import { Component, Input } from "@angular/core";
-import type { MetaPlain } from "@utils";
+import { EditableComponent } from "@components";
+import type { MetaPlain } from "@domain";
 
 @Component({
     selector: "app-task",
     standalone: true,
-    imports: [],
+    imports: [EditableComponent],
     templateUrl: "./task.component.html",
     styleUrl: "./task.component.scss",
 })
