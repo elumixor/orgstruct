@@ -2,6 +2,7 @@ import { notImplemented } from "@utils";
 import type { Identifier } from "./identifier";
 import type { Plain } from "./plain";
 import type { EntityName } from "./entity-names-map";
+import type { IProcess } from "./process";
 
 export function newDivision(): Plain<"division"> {
     return {
@@ -38,6 +39,19 @@ export function newTask(branch: Identifier): Plain<"task"> {
         description: "Description of the task",
         product: "Final Valuable Product that the task produces",
         branch,
+    };
+}
+
+export function newProcess(): IProcess {
+    return {
+        title: "New process",
+        description: "Description of the process",
+        outputs: [],
+        events: [],
+        dependencies: [],
+        responsibility: "unassigned",
+        stage: 0,
+        subtasks: [],
     };
 }
 

@@ -41,12 +41,14 @@ export const notionPropertiesMap: {
         requirements: { name: "Requirements", type: "relation" },
         estimate: { type: "estimate" },
     },
-    process: {
-        ...baseProperties,
-        branch: { name: "Branch", type: "relation", single: true },
-        assignee: { name: "Assignee", type: "relation", single: true },
-        tasks: { name: "Tasks", type: "relation" },
-    },
+    // process: {
+    // ...baseProperties,
+    // branch: { name: "Branch", type: "relation", single: true },
+    // assignee: { name: "Assignee", type: "relation", single: true },
+    // tasks: { name: "Tasks", type: "relation" },
+    // },
+
+    process: undefined as unknown as never,
 
     person: {
         name: { name: "Name", type: "title" },

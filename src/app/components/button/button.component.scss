@@ -1,0 +1,7 @@
+.container {
+    cursor: pointer;
+
+    &>div {
+        padding: 5px 10px;
+    }
+}

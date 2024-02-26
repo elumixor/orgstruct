@@ -5,8 +5,36 @@
 @use "@styles/elements/button.scss";
 @use "@styles/elements/loader.scss";
 @use "@styles/elements/block.scss";
+@use "@styles/elements/card.scss";
+@use "@styles/elements/background.scss";
 
 @use "@styles/animations.scss";
+
+.h1 {
+    font-size: 3em;
+    font-weight: bold;
+}
+
+.h2 {
+    font-size: 2em;
+    font-weight: bold;
+}
+
+.h3 {
+    font-size: 1.5em;
+    font-weight: bold;
+}
+
+.h4 {
+    font-size: 1.2em;
+    font-weight: bold;
+}
+
+.h5 {
+    font-size: 1em;
+    font-weight: bold;
+}
+
 
 html {
     background-color: #eee;
@@ -26,6 +54,10 @@ body {
 
 .bold {
     font-weight: bold;
+}
+
+.underline {
+    text-decoration: underline;
 }
 
 .light {
@@ -110,28 +142,17 @@ body {
     font-size: 0.6em;
 }
 
-
-.h1 {
-    font-size: 3em;
-    font-weight: bold;
+.light, .text-light, .weight-light {
+    font-weight: lighter;
 }
 
-.h2 {
-    font-size: 2em;
-    font-weight: bold;
+.text-normal, .weight-normal {
+    font-weight: normal;
 }
 
-.h3 {
-    font-size: 1.5em;
-    font-weight: bold;
-}
 
-.h4 {
-    font-size: 1.2em;
-    font-weight: bold;
-}
 
-.h5 {
-    font-size: 1em;
-    font-weight: bold;
+
+.pointer {
+    cursor: pointer;
 }

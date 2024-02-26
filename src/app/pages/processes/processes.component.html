@@ -1,0 +1,30 @@
+<div class="app-bg"></div>
+
+<div [appContextMenu]="contextOptions()"
+     class="app-centered">
+    <h1 class="light white">Processes</h1>
+
+    @for (process of processes; track $index) {
+    <div class="process white pointer mb-10"
+         (click)="selectProcess(process)">
+        <div class="h3 weight-normal m-0">{{process.title}}</div>
+        @if (process.description) { <p class="m-0">{{process.description}}</p> }
+    </div>
+    }
+
+</div>
+
+<!-- <app-processes-viewer /> -->
+
+@if (selectedProcess) {
+<app-process-editor [process]="selectedProcess"
+                    [path]="currentPath"
+                    (closed)="selectedProcess = undefined"
+                    (processSelected)="selectedProcess = $event"
+                    (taskSelected)="selectedTask = $event" />
+}
+
+@if (selectedTask) {
+<app-task-editor [task]="selectedTask"
+                 (closed)="selectedTask = undefined" />
+}

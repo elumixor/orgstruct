@@ -3,18 +3,17 @@
      [style.top]="offset.y + 'px'">
     <div class="relative">
         @for (card of cards; track $index) {
-        <div class="content"
+        <div class="content card"
              [@added]="getAnimation($index)"
              [style.pointerEvents]="$index === selected ? 'auto' : 'none'">
 
 
             @if (card.content.closeable) {
-            <div class="close-button"
-                 (appClick)="pop()">
-                <div class="block">
-                    ← Esc
-                </div>
-            </div>
+            <app-button class="close-button"
+                        (clicked)="onEscape()"
+                        key="Escape">
+                ← Esc
+            </app-button>
             }
 
 

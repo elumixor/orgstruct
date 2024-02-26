@@ -3,12 +3,12 @@ import { NgTemplateOutlet } from "@angular/common";
 import { Point, type PointArgs, type RefProviderOptional, elementFromRef } from "@utils";
 import { CardContentDirective } from "./card-content.directive";
 import { animations } from "./animations";
-import { ClickDirective } from "@components";
+import { ButtonComponent, ClickDirective } from "@components";
 
 @Component({
     selector: "app-cards-manager",
     standalone: true,
-    imports: [CardContentDirective, NgTemplateOutlet, ClickDirective],
+    imports: [CardContentDirective, NgTemplateOutlet, ClickDirective, ButtonComponent],
     templateUrl: "./cards-manager.component.html",
     styleUrl: "./cards-manager.component.scss",
     animations: [animations],
@@ -74,8 +74,7 @@ export class CardsManagerComponent {
         this.selected = Math.max(this.selected - 1, 0);
     }
 
-    @HostListener("window:keydown.escape")
-    private onEscape() {
+    onEscape() {
         if (this.currentCard.closeable) this.pop();
     }
 }

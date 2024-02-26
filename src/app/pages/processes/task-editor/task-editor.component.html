@@ -1,0 +1,51 @@
+<div class="container"
+     @appear>
+    <app-button class="close-button m-5"
+                (click)="closed.emit()">Close</app-button>
+
+    <div class="content block white"
+         [appContextMenu]="contextOptions">
+        <app-editable class="h4"
+                      [(text)]="task.title" />
+        <app-editable [(text)]="task.description" />
+
+        <div class="vspace-10"></div>
+
+        <div class="grid">
+            <div>
+                <p class="section-header">Dependencies</p>
+
+                @if (task.dependencies.nonEmpty) {
+                @for (dependency of task.dependencies; track $index) {
+                <div class="block">{{dependency}}</div>
+                }
+                } @else {
+                <app-button (clicked)="addDependency()">Add Dependency</app-button>
+                }
+            </div>
+
+            <div>
+                <p class="section-header">Outputs</p>
+
+                @if (task.outputs.nonEmpty) {
+                @for (output of task.outputs; track $index) {
+                <div class="block">{{output.product}}</div>
+                }
+                } @else {
+                <app-button (clicked)="addOutput()">Add Output</app-button>
+                }
+            </div>
+
+            <div>
+                <p class="section-header">Events</p>
+                @if (task.events.nonEmpty) {
+                @for (event of task.events; track $index) {
+                <div class="block">{{event.title}}</div>
+                }
+                } @else {
+                <app-button (clicked)="addEvent()">Add Event</app-button>
+                }
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,9 +1,0 @@
-<button (pointerenter)="barVisible = true" [class.visible]="!barVisible" #button>
-    <p class="plus">+</p>
-    <p>New Item</p>
-</button>
-<div (pointerleave)="barVisible = false" class="bar" [class.visible]="barVisible" #bar>
-    <app-image-with-text image="items-light.svg" text="task" (pointerdown)="create('task')" justifyContent="center"></app-image-with-text>
-    <app-image-with-text image="items-light.svg" text="person" (pointerdown)="create('person')" justifyContent="center"></app-image-with-text>
-    <app-image-with-text image="items-light.svg" text="position" (pointerdown)="create('position')" justifyContent="center"></app-image-with-text>
-</div>

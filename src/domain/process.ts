@@ -1,11 +1,17 @@
 import type { IBaseInfo } from "./base-info";
-import type { IBranch } from "./branch";
-import type { IPosition } from "./position";
-import type { IProducer } from "./producer";
-import type { ITask } from "./task";
+import type { Identifier } from "./identifier";
 
-export interface IProcess extends IBaseInfo, IProducer {
-    branch?: IBranch;
-    tasks?: ITask[];
-    assignee?: IPosition;
+export interface IProcess extends IBaseInfo {
+    dependencies: string[]; // also "inputs"
+    outputs: { outcome: string; product: string }[];
+    events: { title: string; description?: string; product: string }[];
+    responsibility: Responsibility;
+    stage: number;
+    subtasks: IProcess[];
 }
+
+type Responsibility =
+    | "unassigned"
+    | "owner"
+    | "ceo"
+    | { type: "division" | "office" | "branch" | "position"; id: Identifier }; // todo: Generalize "owner", "ceo"...

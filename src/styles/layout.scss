@@ -50,6 +50,14 @@ $borderMedium: 15px;
         } @else if $kind == "h" {
             #{$property}-left: $size + px;
             #{$property}-right: $size + px;
+        } @else if $kind == "t" {
+            #{$property}-top: $size + px;
+        } @else if $kind == "r" {
+            #{$property}-right: $size + px;
+        } @else if $kind == "b" {
+            #{$property}-bottom: $size + px;
+        } @else if $kind == "l" {
+            #{$property}-left: $size + px;
         }
     }
 }
@@ -69,7 +77,7 @@ $borderMedium: 15px;
             @include margin-uniform($i * 5, $type);
         }
 
-        @each $kind in "v", "h" {
+        @each $kind in "v", "h", "t", "r", "b", "l" {
             @for $i from 0 through 10 {
                 @include margin-single($kind, $i * 5, $type);
             }
@@ -82,3 +90,13 @@ $borderMedium: 15px;
 @include spaces;
 @include gaps;
 @include margins;
+
+
+
+
+.app-centered {
+    width: 100%;
+    max-width: 600px;
+    padding: 35px 35px;
+    margin: 35px auto;
+}
