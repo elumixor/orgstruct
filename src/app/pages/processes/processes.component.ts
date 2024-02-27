@@ -1,6 +1,6 @@
 import { isPlatformBrowser } from "@angular/common";
 import { Component, PLATFORM_ID, inject, type AfterViewChecked, type OnInit } from "@angular/core";
-import { ContextMenuDirective, EditableComponent, type IContextMenuOption } from "@components";
+import { ContextMenuDirective, EditableComponent, WithIconComponent, type IContextMenuOption } from "@components";
 import { ProcessEditorComponent } from "./process-editor/process-editor.component";
 import { newProcess, type IProcess } from "@domain";
 import { TaskEditorComponent } from "./task-editor/task-editor.component";
@@ -8,7 +8,7 @@ import { TaskEditorComponent } from "./task-editor/task-editor.component";
 @Component({
     selector: "app-processes",
     standalone: true,
-    imports: [ContextMenuDirective, ProcessEditorComponent, TaskEditorComponent, EditableComponent],
+    imports: [ContextMenuDirective, ProcessEditorComponent, TaskEditorComponent, EditableComponent, WithIconComponent],
     templateUrl: "./processes.component.html",
     styleUrl: "./processes.component.scss",
 })
@@ -32,13 +32,24 @@ export class ProcessesComponent implements OnInit, AfterViewChecked {
         if (isPlatformBrowser(this.platformId)) localStorage.setItem("processes", JSON.stringify(this.processes));
     }
 
-    contextOptions() {
-        return [
+    contextOptions(process?: IProcess) {
+        const options: IContextMenuOption[] = [
             {
                 text: "Add process",
                 action: () => this.processes.push(newProcess()),
+                icon: "add.svg",
             },
-        ] satisfies IContextMenuOption[];
+        ];
+
+        if (process)
+            options.push({
+                text: "Remove process",
+                action: () => this.processes.remove(process),
+                flavor: "danger",
+                icon: "remove.svg",
+            });
+
+        return options;
     }
 
     selectProcess(process: IProcess) {

@@ -9,13 +9,7 @@
     @for (option of options; track $index) {
     <div class="option flavor-{{option.flavor ?? 'default'}}"
          (appClick)="selectOption(option)">
-
-        @if (option.icon) {
-        <img [src]="option.icon"
-             alt="icon" />
-        }
-
-        {{option.text}}
+        <app-with-icon [icon]="option.icon">{{option.text}}</app-with-icon>
     </div>
     }
 </div>

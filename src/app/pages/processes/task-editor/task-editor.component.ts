@@ -1,12 +1,12 @@
-import { trigger, transition, group, style, animate } from "@angular/animations";
+import { animate, style, transition, trigger } from "@angular/animations";
 import { Component, EventEmitter, Input, Output } from "@angular/core";
-import { ButtonComponent, ContextMenuDirective, EditableComponent } from "@components";
+import { ButtonComponent, ContextMenuDirective, EditableComponent, WithIconComponent } from "@components";
 import type { IProcess } from "@domain";
 
 @Component({
     selector: "app-task-editor",
     standalone: true,
-    imports: [EditableComponent, ButtonComponent, ContextMenuDirective],
+    imports: [EditableComponent, ButtonComponent, ContextMenuDirective, WithIconComponent],
     templateUrl: "./task-editor.component.html",
     styleUrl: "./task-editor.component.scss",
     animations: [
@@ -24,6 +24,7 @@ import type { IProcess } from "@domain";
 })
 export class TaskEditorComponent {
     @Input({ required: true }) task!: IProcess;
+    @Input({ required: true }) parentProcess!: IProcess;
     @Output() closed = new EventEmitter();
 
     readonly contextOptions = [

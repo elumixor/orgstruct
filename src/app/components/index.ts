@@ -7,6 +7,8 @@ export * from "./editable/editable.component";
 export * from "./error-message/error-message.component";
 export * from "./loader/loader.component";
 export * from "./button/button.component";
+export * from "./icon/icon.component";
+export * from "./with-icon/with-icon.component";
 export * from "./click.directive";
 export * from "./lazy-for.directive";
 export * from "./context-menu";

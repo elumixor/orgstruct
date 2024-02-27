@@ -1,0 +1,12 @@
+<div class="flex align-center gap-5">
+    @if (icon) {
+    <app-icon class="icon"
+              [src]="icon"
+              [style.fontSize]="size"
+              [color]="color" />
+    }
+
+    <div class="flex-grow">
+        <ng-content></ng-content>
+    </div>
+</div>

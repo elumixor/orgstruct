@@ -1,12 +1,13 @@
-import { Component, ElementRef, HostListener, ViewChild } from "@angular/core";
 import { animate, query, stagger, style, transition, trigger } from "@angular/animations";
+import { Component, ElementRef, HostListener, ViewChild } from "@angular/core";
 import { ClickDirective } from "../click.directive";
+import { WithIconComponent } from "../with-icon/with-icon.component";
 import type { IContextMenuOption } from "./context-menu-option";
 
 @Component({
     selector: "app-context-menu",
     standalone: true,
-    imports: [ClickDirective],
+    imports: [ClickDirective, WithIconComponent],
     templateUrl: "./context-menu.component.html",
     styleUrl: "./context-menu.component.scss",
     animations: [

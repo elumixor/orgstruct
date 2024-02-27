@@ -5,15 +5,22 @@
 
     <div class="content block white"
          [appContextMenu]="contextOptions">
-        <app-editable class="h4"
-                      [(text)]="task.title" />
+        <app-with-icon class="h4"
+                       icon="task.svg"
+                       color="white">
+            <app-editable [(text)]="task.title" />
+        </app-with-icon>
+
         <app-editable [(text)]="task.description" />
 
         <div class="vspace-10"></div>
 
         <div class="grid">
             <div>
-                <p class="section-header">Dependencies</p>
+                <app-with-icon icon="input.svg"
+                               size="12px">
+                    <p class="section-header">Dependencies</p>
+                </app-with-icon>
 
                 @if (task.dependencies.nonEmpty) {
                 @for (dependency of task.dependencies; track $index) {
@@ -25,7 +32,25 @@
             </div>
 
             <div>
-                <p class="section-header">Outputs</p>
+                <app-with-icon icon="event.svg"
+                               size="12px">
+                    <p class="section-header">Events</p>
+                </app-with-icon>
+
+                @if (task.events.nonEmpty) {
+                @for (event of task.events; track $index) {
+                <div class="block">{{event.title}}</div>
+                }
+                } @else {
+                <app-button (clicked)="addEvent()">Add Event</app-button>
+                }
+            </div>
+
+            <div>
+                <app-with-icon icon="output.svg"
+                               size="12px">
+                    <p class="section-header">Outputs</p>
+                </app-with-icon>
 
                 @if (task.outputs.nonEmpty) {
                 @for (output of task.outputs; track $index) {
@@ -33,17 +58,6 @@
                 }
                 } @else {
                 <app-button (clicked)="addOutput()">Add Output</app-button>
-                }
-            </div>
-
-            <div>
-                <p class="section-header">Events</p>
-                @if (task.events.nonEmpty) {
-                @for (event of task.events; track $index) {
-                <div class="block">{{event.title}}</div>
-                }
-                } @else {
-                <app-button (clicked)="addEvent()">Add Event</app-button>
                 }
             </div>
         </div>

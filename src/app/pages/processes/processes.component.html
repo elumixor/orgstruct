@@ -4,13 +4,19 @@
      class="app-centered">
     <h1 class="light white">Processes</h1>
 
-    @for (process of processes; track $index) {
-    <div class="process white pointer mb-10"
-         (click)="selectProcess(process)">
-        <div class="h3 weight-normal m-0">{{process.title}}</div>
-        @if (process.description) { <p class="m-0">{{process.description}}</p> }
+    <div class="flex-column flex gap-10">
+        @for (process of processes; track $index) {
+        <app-with-icon class="process white pointer"
+                       icon="process.svg"
+                       (click)="selectProcess(process)"
+                       [appContextMenu]="contextOptions(process)">
+            <div class="h3 weight-normal m-0">{{process.title}}</div>
+        </app-with-icon>
+        @if (process.description) {
+        <p class="m-0">{{process.description}}</p>
+        }
+        }
     </div>
-    }
 
 </div>
 
@@ -26,5 +32,6 @@
 
 @if (selectedTask) {
 <app-task-editor [task]="selectedTask"
+                 [parentProcess]="selectedProcess!"
                  (closed)="selectedTask = undefined" />
 }
