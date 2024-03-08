@@ -15,13 +15,11 @@
                       [(text)]="process.description" />
 
         <div class="flex-row flex-grow flex align-center editor-container gap-20">
-            <div class="section column"
-                 [appContextMenu]="dependenciesCO()">
+            <div class="section column">
                 <h4 class="section-header">Dependencies</h4>
 
                 @for (dependency of process.dependencies; track $index) {
-                <div class="section-item"
-                     [appContextMenu]="dependenciesCO(dependency)">
+                <div class="section-item">
                     <app-editable class="section-item"
                                   [text]="dependency" />
                     <div class="connector"></div>
@@ -39,7 +37,14 @@
                     @for (task of subtasks; track $index) {
                     <div class="block task"
                          (appClick)="showEditor(task)">
-                        <div [appContextMenu]="taskCO(task)">{{task.title}}</div>
+                        <div>{{task.title}}</div>
+                    </div>
+                    }
+
+                    @for (stage of stages; track $index) {
+                    <div class="stage-background"
+                         [style.gridColumn]="($index + 1) + ' / ' + ($index + 2)">
+                        <div>Stage {{$index + 1}}</div>
                     </div>
                     }
 
@@ -48,27 +53,23 @@
 
             <div class="flex-column column">
 
-                <div class="section"
-                     [appContextMenu]="outputsCO()">
+                <div class="section">
                     <h4 class="section-header">Outputs</h4>
 
                     @for (output of process.outputs; track $index) {
-                    <div class="section-item"
-                         [appContextMenu]="outputsCO(output)">
+                    <div class="section-item">
                         <app-editable [text]="output.product" />
                         <div class="connector reversed"></div>
                     </div>
                     }
                 </div>
 
-                <div class="section"
-                     [appContextMenu]="eventsCO()">
+                <div class="section">
                     <h4 class="section-header">Events</h4>
 
 
                     @for (event of process.events; track $index) {
-                    <div class="section-item"
-                         [appContextMenu]="eventsCO(event)">
+                    <div class="section-item">
                         <app-editable [text]="event.title" />
                         <div class="connector reversed"></div>
                     </div>

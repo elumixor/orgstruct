@@ -10,10 +10,11 @@ $tech: #8340DA;
 $qa: #4B8D4E;
 $pr: #449586;
 
+$primary: #1e7694;
 $danger: #b3082d;
 $action: #007bac;
-
 $accent: #9c8fff;
+$warning: #a19924;
 
 .bg-white {
     background-color: $white;
@@ -34,3 +35,31 @@ $accent: #9c8fff;
 .accent {
     color: $accent;
 }
+
+@mixin colors {
+    @each $type in "fg", "bg" {
+        $property: if($type == "fg", "color", "background-color");
+
+        .#{$type}-primary {
+            #{$property}: $primary;
+        }
+
+        .#{$type}-accent {
+            #{$property}: $accent;
+        }
+
+        .#{$type}-danger {
+            #{$property}: $danger;
+        }
+
+        .#{$type}-warning {
+            #{$property}: $warning;
+        }
+
+        .#{$type}-action {
+            #{$property}: $action;
+        }
+    }
+}
+
+@include colors;

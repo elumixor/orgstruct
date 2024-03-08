@@ -1,5 +1,6 @@
 import { NgStyle } from "@angular/common";
 import { Component, Input } from "@angular/core";
+import { parseColor } from "@utils";
 
 @Component({
     selector: "app-icon",
@@ -11,13 +12,21 @@ import { Component, Input } from "@angular/core";
 export class IconComponent {
     @Input({ required: true }) src!: string;
     @Input() color = "black";
+    @Input() size?: string;
 
     get style() {
         const maskImage = `url(assets/images/${this.src})`;
-        return {
+        const options = {
             "mask-image": maskImage,
             "-webkit-mask-image": maskImage,
-            "background-color": this.color,
-        };
+            "background-color": parseColor(this.color),
+        } as Record<string, string>;
+
+        if (this.size) {
+            options["width"] = this.size;
+            options["height"] = this.size;
+        }
+
+        return options;
     }
 }

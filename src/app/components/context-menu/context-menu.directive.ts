@@ -1,6 +1,6 @@
 import { Directive, ElementRef, Input } from "@angular/core";
-import { ContextMenuComponent } from "./context-menu.component";
 import type { IContextMenuOption } from "./context-menu-option";
+import { ContextMenuComponent } from "./context-menu.component";
 
 @Directive({
     selector: "[appContextMenu]",

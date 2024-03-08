@@ -1,12 +1,12 @@
 import { animate, style, transition, trigger } from "@angular/animations";
 import { Component, EventEmitter, Input, Output } from "@angular/core";
-import { ButtonComponent, ContextMenuDirective, EditableComponent, WithIconComponent } from "@components";
+import { ButtonComponent, EditableComponent, WithIconComponent } from "@components";
 import type { IProcess } from "@domain";
 
 @Component({
     selector: "app-task-editor",
     standalone: true,
-    imports: [EditableComponent, ButtonComponent, ContextMenuDirective, WithIconComponent],
+    imports: [EditableComponent, ButtonComponent, WithIconComponent],
     templateUrl: "./task-editor.component.html",
     styleUrl: "./task-editor.component.scss",
     animations: [
@@ -27,21 +27,6 @@ export class TaskEditorComponent {
     @Input({ required: true }) parentProcess!: IProcess;
     @Output() closed = new EventEmitter();
 
-    readonly contextOptions = [
-        {
-            text: "Add dependency",
-            action: () => this.task.dependencies.push("New dependency"),
-        },
-        {
-            text: "Add event",
-            action: () => this.task.events.push({ title: "New event", product: "Event product" }),
-        },
-        {
-            text: "Add output",
-            action: () => this.task.outputs.push({ outcome: "default", product: "Output product" }),
-        },
-    ];
-
     addEvent() {
         this.task.events.push({ title: "New event", product: "Event product" });
     }
@@ -52,5 +37,42 @@ export class TaskEditorComponent {
 
     addDependency() {
         this.task.dependencies.push("New dependency");
+    }
+
+    sections;
+
+    constructor() {
+        // eslint-disable-next-line @typescript-eslint/no-this-alias
+        const self = this;
+
+        this.sections = [
+            {
+                title: "Dependencies",
+                icon: "input.svg",
+                addItemTitle: "Add dependency",
+                addItem: this.addDependency.bind(this),
+                get items() {
+                    return self.task.dependencies;
+                },
+            },
+            {
+                title: "Events",
+                icon: "event.svg",
+                addItemTitle: "Add event",
+                addItem: this.addEvent.bind(this),
+                get items() {
+                    return self.task.events;
+                },
+            },
+            {
+                title: "Outputs",
+                icon: "output.svg",
+                addItemTitle: "Add output",
+                addItem: this.addOutput.bind(this),
+                get items() {
+                    return self.task.outputs;
+                },
+            },
+        ];
     }
 }

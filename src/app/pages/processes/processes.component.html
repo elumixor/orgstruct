@@ -1,22 +1,35 @@
 <div class="app-bg"></div>
 
-<div [appContextMenu]="contextOptions()"
-     class="app-centered">
+<div class="app-centered">
     <h1 class="light white">Processes</h1>
 
-    <div class="flex-column flex gap-10">
-        @for (process of processes; track $index) {
-        <app-with-icon class="process white pointer"
+
+    @for (process of processes(); track $index) {
+    <app-with-context>
+        <app-with-icon class="process white pointer mb-10"
                        icon="process.svg"
-                       (click)="selectProcess(process)"
-                       [appContextMenu]="contextOptions(process)">
+                       size="10px"
+                       (click)="selectProcess(process)">
             <div class="h3 weight-normal m-0">{{process.title}}</div>
+            @if (process.description) { <p class="m-0">{{process.description}}</p> }
         </app-with-icon>
-        @if (process.description) {
-        <p class="m-0">{{process.description}}</p>
-        }
-        }
-    </div>
+
+        <app-context-option (action)="removeProcess(process)">
+            <app-with-icon class="block button inline-block white bg-danger"
+                           icon="remove.svg"
+                           size="0.6em">
+                Remove
+            </app-with-icon>
+        </app-context-option>
+    </app-with-context>
+    }
+
+    <app-with-icon class="block button inline-block white"
+                   icon="add.svg"
+                   size="10px"
+                   (appClick)="addProcess()">
+        Add process
+    </app-with-icon>
 
 </div>
 

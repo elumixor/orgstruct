@@ -3,8 +3,7 @@
     <app-button class="close-button m-5"
                 (click)="closed.emit()">Close</app-button>
 
-    <div class="content block white"
-         [appContextMenu]="contextOptions">
+    <div class="content block white">
         <app-with-icon class="h4"
                        icon="task.svg"
                        color="white">
@@ -16,50 +15,29 @@
         <div class="vspace-10"></div>
 
         <div class="grid">
+            @for (section of sections; track $index) {
             <div>
-                <app-with-icon icon="input.svg"
+                <app-with-icon [icon]="section.icon"
                                size="12px">
-                    <p class="section-header">Dependencies</p>
+                    <p class="section-header">{{section.title}}</p>
                 </app-with-icon>
 
-                @if (task.dependencies.nonEmpty) {
-                @for (dependency of task.dependencies; track $index) {
-                <div class="block">{{dependency}}</div>
-                }
-                } @else {
-                <app-button (clicked)="addDependency()">Add Dependency</app-button>
-                }
-            </div>
-
-            <div>
-                <app-with-icon icon="event.svg"
-                               size="12px">
-                    <p class="section-header">Events</p>
+                @for (item of section.items; track $index) {
+                <app-with-icon class="block"
+                               [icon]="section.icon"
+                               [style.fontSize]="'12px'"
+                               size="0.8em">
+                    {{item}}
                 </app-with-icon>
+                }
 
-                @if (task.events.nonEmpty) {
-                @for (event of task.events; track $index) {
-                <div class="block">{{event.title}}</div>
-                }
-                } @else {
-                <app-button (clicked)="addEvent()">Add Event</app-button>
-                }
+                <app-with-icon icon="add.svg"
+                               [style.fontSize]="'10px'"
+                               class="block button"
+                               size="0.8em"
+                               (clicked)="section.addItem()">{{section.addItemTitle}}</app-with-icon>
             </div>
-
-            <div>
-                <app-with-icon icon="output.svg"
-                               size="12px">
-                    <p class="section-header">Outputs</p>
-                </app-with-icon>
-
-                @if (task.outputs.nonEmpty) {
-                @for (output of task.outputs; track $index) {
-                <div class="block">{{output.product}}</div>
-                }
-                } @else {
-                <app-button (clicked)="addOutput()">Add Output</app-button>
-                }
-            </div>
+            }
         </div>
     </div>
 </div>

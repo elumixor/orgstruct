@@ -1,12 +1,6 @@
 import { animate, group, style, transition, trigger } from "@angular/animations";
 import { Component, EventEmitter, Input, Output } from "@angular/core";
-import {
-    ButtonComponent,
-    ClickDirective,
-    ContextMenuDirective,
-    EditableComponent,
-    type IContextMenuOption,
-} from "@components";
+import { ButtonComponent, ClickDirective, ContextMenuDirective, EditableComponent } from "@components";
 import { newProcess, type IProcess } from "@domain";
 
 @Component({
@@ -68,73 +62,6 @@ export class ProcessEditorComponent {
                 if (typeof a === "string" || typeof b === "string") return false;
                 return a.id === b.id;
             });
-    }
-
-    dependenciesCO(dependency?: string) {
-        const result: IContextMenuOption[] = [
-            {
-                text: "Add dependency",
-                action: () => this.process.dependencies.push("New dependency"),
-            },
-        ];
-
-        if (dependency) {
-            result.push({
-                text: "Remove dependency",
-                action: () => this.process.dependencies.remove(dependency),
-                flavor: "danger",
-            });
-        }
-
-        return result;
-    }
-
-    eventsCO(event?: { title: string; product: string }) {
-        const result: IContextMenuOption[] = [
-            {
-                text: "Add event",
-                action: () => this.process.events.push({ title: "New event", product: "Event product" }),
-            },
-        ];
-
-        if (event) {
-            result.push({
-                text: "Remove event",
-                action: () => this.process.events.remove(event),
-                flavor: "danger",
-            });
-        }
-
-        return result;
-    }
-
-    outputsCO(output?: { outcome: string; product: string }) {
-        const result: IContextMenuOption[] = [
-            {
-                text: "Add output",
-                action: () => this.process.outputs.push({ outcome: "default", product: "Output product" }),
-            },
-        ];
-
-        if (output) {
-            result.push({
-                text: "Remove output",
-                action: () => this.process.outputs.remove(output),
-                flavor: "danger",
-            });
-        }
-
-        return result;
-    }
-
-    taskCO(task: IProcess) {
-        return [
-            {
-                text: "Remove task",
-                action: () => this.process.subtasks.remove(task),
-                flavor: "danger",
-            },
-        ] satisfies IContextMenuOption[];
     }
 
     showEditor(task: IProcess) {
