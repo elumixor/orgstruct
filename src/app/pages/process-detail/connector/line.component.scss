@@ -1,0 +1,35 @@
+path {
+    pointer-events: all;
+    stroke: var(--grey);
+    stroke-width: 2px;
+    transition: stroke-width var(--duration-action);
+
+    &.container {
+        stroke: transparent;
+        stroke-width: 20px;
+    }
+
+    &.moving {
+        stroke-width: 5px;
+        stroke-dasharray: 0 10;
+        animation: dash 0.5s linear infinite;
+        stroke-linecap: round;
+
+        &.hovered {
+            stroke-width: 7px;
+        }
+
+        @keyframes dash {
+            0% {
+                stroke-dashoffset: 10;
+            }
+            100% {
+                stroke-dashoffset: 0;
+            }
+        }
+    }
+
+    &.hovered {
+        stroke-width: 5px;
+    }
+}

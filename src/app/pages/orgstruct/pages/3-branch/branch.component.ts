@@ -1,5 +1,5 @@
 import { Component, Input, inject } from "@angular/core";
-import { ContextMenuDirective, EditableComponent, LazyForDirective, type IContextMenuOption } from "@components";
+import { EditableComponent, LazyForDirective, type IContextMenuOption } from "@components";
 import { TaskComponent } from "../../items/task/task.component";
 import { DataService, type Lazy } from "@services";
 import { newTask, type MetaPlain } from "@domain";
@@ -7,7 +7,7 @@ import { newTask, type MetaPlain } from "@domain";
 @Component({
     selector: "app-branch",
     standalone: true,
-    imports: [ContextMenuDirective, TaskComponent, EditableComponent, LazyForDirective],
+    imports: [TaskComponent, EditableComponent, LazyForDirective],
     templateUrl: "./branch.component.html",
     styleUrl: "./branch.component.scss",
 })
@@ -29,14 +29,14 @@ export class BranchComponent {
     contextOptions(task?: Lazy<"task">) {
         const options: IContextMenuOption[] = [
             {
-                text: "Add task",
+                title: "Add task",
                 action: () => this.tasks.add(this.data.lazifyFrom("task", newTask(this.branch))),
             },
         ];
 
         if (task) {
             options.push({
-                text: "Remove task",
+                title: "Remove task",
                 flavor: "danger",
                 action: () => this.tasks.remove(task),
             });

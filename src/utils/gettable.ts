@@ -6,7 +6,7 @@ export function lazy<T>(fn: () => PromiseLike<T>) {
     return {
         async get() {
             if (currentValue !== undefined) return currentValue;
-            if (inProgress) return currentPromise as PromiseLike<T>;
+            if (inProgress) return currentPromise!;
 
             currentPromise = fn();
             inProgress = true;

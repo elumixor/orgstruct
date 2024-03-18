@@ -1,14 +1,8 @@
 import { Component, inject } from "@angular/core";
-import {
-    ClickDirective,
-    ContextMenuDirective,
-    EditableComponent,
-    LazyForDirective,
-    type IContextMenuOption,
-} from "@components";
+import { ClickDirective, EditableComponent, LazyForDirective, type IContextMenuOption } from "@components";
 import { DataService, NetworkService, type Lazy } from "@services";
 import { CardContentDirective, CardsManagerComponent } from "../../cards-manager";
-import { ConnectableDirective, ConnectorComponent } from "../../connector";
+// import { ConnectableDirective, ConnectorComponent } from "../../connector";
 import { DivisionComponent } from "../1-division/division.component";
 import { newDivision } from "@domain";
 
@@ -16,11 +10,10 @@ import { newDivision } from "@domain";
     selector: "app-main",
     standalone: true,
     imports: [
-        ConnectorComponent,
-        ConnectableDirective,
+        // ConnectorComponent,
+        // ConnectableDirective,
         CardContentDirective,
         DivisionComponent,
-        ContextMenuDirective,
         ClickDirective,
         EditableComponent,
         LazyForDirective,
@@ -47,14 +40,14 @@ export class MainComponent {
     contextOptions(division?: Lazy<"division">) {
         const options: IContextMenuOption[] = [
             {
-                text: "Add division",
+                title: "Add division",
                 action: () => this.divisions.add(this.data.lazifyFrom("division", newDivision())),
             },
         ];
 
         if (division) {
             options.push({
-                text: "Remove division",
+                title: "Remove division",
                 flavor: "danger",
                 action: () => this.divisions.remove(division),
             });

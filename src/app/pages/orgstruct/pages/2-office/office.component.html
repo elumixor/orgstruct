@@ -1,4 +1,4 @@
-<div [appContextMenu]="contextOptions()">
+<div>
     <app-editable class="h3"
                   [(text)]="office.title"></app-editable>
     <app-editable [(text)]="office.description"></app-editable>
@@ -7,7 +7,6 @@
         <div *appLazyFor="let branch of branches(); type: 'branch'; let branchProxy = proxy;"
              class="block"
              (appClick)="cardsManager.push(branchRef, { from: blockRef })"
-             [appContextMenu]="contextOptions(branchProxy)"
              #blockRef>
 
             <p block-title

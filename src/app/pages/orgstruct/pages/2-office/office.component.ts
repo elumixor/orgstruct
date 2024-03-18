@@ -1,11 +1,5 @@
 import { Component, Input, inject } from "@angular/core";
-import {
-    ClickDirective,
-    ContextMenuDirective,
-    EditableComponent,
-    LazyForDirective,
-    type IContextMenuOption,
-} from "@components";
+import { ClickDirective, EditableComponent, LazyForDirective, type IContextMenuOption } from "@components";
 import { newBranch, type MetaPlain } from "@domain";
 import { DataService, type Lazy } from "@services";
 import { CardContentDirective, CardsManagerComponent } from "../../cards-manager";
@@ -14,14 +8,7 @@ import { BranchComponent } from "../3-branch/branch.component";
 @Component({
     selector: "app-office",
     standalone: true,
-    imports: [
-        ContextMenuDirective,
-        CardContentDirective,
-        ClickDirective,
-        EditableComponent,
-        BranchComponent,
-        LazyForDirective,
-    ],
+    imports: [CardContentDirective, ClickDirective, EditableComponent, BranchComponent, LazyForDirective],
     templateUrl: "./office.component.html",
     styleUrl: "./office.component.scss",
 })
@@ -43,13 +30,13 @@ export class OfficeComponent {
     contextOptions(branch?: Lazy<"branch">) {
         const options: IContextMenuOption[] = [
             {
-                text: "Add branch",
+                title: "Add branch",
                 action: () => this.branches.add(this.proxy.lazifyFrom("branch", newBranch(this.office))),
             },
         ];
         if (branch) {
             options.push({
-                text: "Remove branch",
+                title: "Remove branch",
                 flavor: "danger",
                 action: () => this.branches.remove(branch),
             });

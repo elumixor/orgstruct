@@ -1,11 +1,5 @@
 import { Component, Input, inject } from "@angular/core";
-import {
-    ClickDirective,
-    ContextMenuDirective,
-    EditableComponent,
-    LazyForDirective,
-    type IContextMenuOption,
-} from "@components";
+import { ClickDirective, EditableComponent, LazyForDirective, type IContextMenuOption } from "@components";
 import { newOffice, type MetaPlain } from "@domain";
 import { DataService, syncArrays, type Lazy } from "@services";
 import { CardContentDirective } from "../../cards-manager/card-content.directive";
@@ -20,12 +14,10 @@ import { OfficeComponent } from "../2-office/office.component";
         CardContentDirective,
         CardsManagerComponent,
         ClickDirective,
-        ContextMenuDirective,
         EditableComponent,
         LazyForDirective,
     ],
     templateUrl: "./division.component.html",
-    styleUrl: "./division.component.scss",
 })
 export class DivisionComponent {
     readonly cardsManager = inject(CardsManagerComponent);
@@ -51,13 +43,13 @@ export class DivisionComponent {
     contextOptions(office?: Lazy<"office">) {
         const options: IContextMenuOption[] = [
             {
-                text: "Add office",
+                title: "Add office",
                 action: () => this.offices.add(this.data.lazifyFrom("office", newOffice(this.division))),
             },
         ];
         if (office) {
             options.push({
-                text: "Remove office",
+                title: "Remove office",
                 flavor: "danger",
                 action: () => this.offices.remove(office),
             });

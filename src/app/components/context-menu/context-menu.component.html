@@ -1,16 +1,13 @@
-<ng-content></ng-content>
-
-@if (visible) {
-<div class="container fixed white"
-     [style.left]="left"
-     [style.top]="top"
-     [@appear]="options.length"
-     #containerRef>
-    @for (option of options; track $index) {
-    <div class="option flavor-{{option.flavor ?? 'default'}}"
-         (appClick)="selectOption(option)">
-        <app-with-icon [icon]="option.icon">{{option.text}}</app-with-icon>
-    </div>
+<div class="container" @appear>
+    @for (option of options.options; track $index) {
+    <app-with-icon
+                   class="context-option flavor-{{ option.flavor }}"
+                   (appClick)="action(option)"
+                   [icon]="option.icon">
+        <div class="option-content">
+            {{ option.title }}
+            @if (option.shortcut) { <app-shortcut [shortcut]="option.shortcut" (pressed)="action(option)" /> }
+        </div>
+    </app-with-icon>
     }
 </div>
-}

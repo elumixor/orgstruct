@@ -1,65 +1,40 @@
-$grey: #292929;
-$light-grey: lighten($grey, 70%);
-$white: #eee;
-
-$admin: #FFB800;
-$construction: #D0682E;
-$distribution: #CC2A8B;
-$finance: #DA3939;
-$tech: #8340DA;
-$qa: #4B8D4E;
-$pr: #449586;
-
-$primary: #1e7694;
-$danger: #b3082d;
-$action: #007bac;
-$accent: #9c8fff;
-$warning: #a19924;
-
-.bg-white {
-    background-color: $white;
+@function mix($color1, $color2) {
+    @return color-mix(in srgb, $color1, $color2);
 }
 
-.bg-grey {
-    background-color: $grey;
+@function darken($color, $amount: 10%) {
+    @return mix($color, black $amount);
 }
 
-.white {
-    color: $white;
+@function transparentize($color, $amount: 50%) {
+    @return mix($color $amount, transparent);
 }
 
-.grey {
-    color: $grey;
+:root {
+    --primary: #1e7694;
+    --secondary: #9c8fff;
+
+    --danger: #b3082d;
+    --error: var(--danger);
+    --warning: #a19924;
+
+    --white: #eee;
+    --black: #222;
+
+    --grey: color-mix(in srgb, var(--black) 50%, var(--white));
+    --grey-lighter: color-mix(in srgb, var(--black) 20%, var(--white));
+    --grey-darker: color-mix(in srgb, var(--black) 80%, var(--white));
+
+    --fg-color: var(--black);
+    --bg-color: var(--white);
+
+    color: var(--fg-color);
 }
 
-.accent {
-    color: $accent;
+::selection {
+    background: color-mix(in srgb, var(--secondary) 50%, transparent);
 }
 
-@mixin colors {
-    @each $type in "fg", "bg" {
-        $property: if($type == "fg", "color", "background-color");
-
-        .#{$type}-primary {
-            #{$property}: $primary;
-        }
-
-        .#{$type}-accent {
-            #{$property}: $accent;
-        }
-
-        .#{$type}-danger {
-            #{$property}: $danger;
-        }
-
-        .#{$type}-warning {
-            #{$property}: $warning;
-        }
-
-        .#{$type}-action {
-            #{$property}: $action;
-        }
-    }
+html {
+    background-color: var(--white);
 }
-
-@include colors;

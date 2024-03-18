@@ -1,0 +1,53 @@
+<div
+     [appContextMenu]="contextOptions"
+     class="container"
+     (appDrag)="onDrag($event)"
+     (pointerenter)="hovered = true"
+     (pointerleave)="hovered = false"
+     #container>
+    <div class="title">
+        {{block.title}}
+    </div>
+    <div class="description">
+        Short description of the block...
+    </div>
+
+    <!-- <app-icon class="icon input" src="input.svg" />
+    <app-icon class="icon event" src="event.svg" />
+    <app-icon class="icon output" src="output.svg" /> -->
+
+    @if (hovered) {
+    <div @appear-left class="section outputs ">
+        <div class="add-container" (pointerdown)="startLine($event, 'output')">
+            <app-icon class="icon inline-block" src="block-output.svg" />
+            <div class="hint">Add output</div>
+        </div>
+    </div>
+
+    <div @appear-right class="section inputs">
+        <div class="add-container flex gap-5" (pointerdown)="startLine($event, 'input')">
+            <div class="hint">Add input</div>
+            <app-icon class="icon inline-block" src="block-dependency.svg" />
+        </div>
+    </div>
+
+    <div class="section events" (pointerdown)="startLine($event, 'event')">
+        <div @appear-down>
+            <div class="add-container flex-column flex gap-5">
+                <app-icon class="icon inline-block" src="block-event.svg" />
+                <div class="hint">Add event</div>
+            </div>
+        </div>
+    </div>
+    }
+
+    <div class="anchor right" [class.hidden]="!hasOutputs" #outputAnchor>
+        <div class="icon output"></div>
+    </div>
+    <div class="anchor left" [class.hidden]="!hasInputs" #inputAnchor>
+        <div class="icon input"></div>
+    </div>
+    <div class="anchor bottom" [class.hidden]="!hasEvents" #eventAnchor>
+        <div class="icon event"></div>
+    </div>
+</div>

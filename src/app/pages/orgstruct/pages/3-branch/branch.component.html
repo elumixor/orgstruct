@@ -1,4 +1,4 @@
-<div [appContextMenu]="contextOptions()">
+<div>
     <app-editable class="h3"
                   [(text)]="branch.title" />
     <app-editable [(text)]="branch.description" />
@@ -6,6 +6,5 @@
     <h3>Tasks</h3>
 
     <app-task *appLazyFor="let task of tasks(); type: 'task'; let taskProxy = proxy;"
-              [task]="task"
-              [appContextMenu]="contextOptions(taskProxy)" />
+              [task]="task" />
 </div>

@@ -1,19 +1,30 @@
-import { Directive, ElementRef, Input } from "@angular/core";
-import type { IContextMenuOption } from "./context-menu-option";
+import { isPlatformBrowser } from "@angular/common";
+import { Directive, ElementRef, Input, PLATFORM_ID, ViewContainerRef, inject } from "@angular/core";
+import type { ContextOptions } from "./context-menu-option";
 import { ContextMenuComponent } from "./context-menu.component";
 
 @Directive({
     selector: "[appContextMenu]",
     standalone: true,
+    exportAs: "appContextMenu",
 })
 export class ContextMenuDirective {
-    @Input({ required: true }) appContextMenu: IContextMenuOption[] = [];
+    @Input({ required: true }) appContextMenu!: ContextOptions;
 
-    constructor(contextMenu: ContextMenuComponent, hostElement: ElementRef<HTMLElement>) {
-        hostElement.nativeElement.addEventListener("contextmenu", (event: MouseEvent) => {
-            event.preventDefault();
-            event.stopPropagation();
-            contextMenu.show(event.clientX, event.clientY, this.appContextMenu);
+    private readonly platformId = inject(PLATFORM_ID);
+    private readonly viewContainer = inject(ViewContainerRef);
+
+    constructor(elementRef: ElementRef<HTMLElement>) {
+        if (!isPlatformBrowser(this.platformId)) return;
+
+        elementRef.nativeElement.addEventListener("contextmenu", (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            this.show(e.clientX, e.clientY);
         });
+    }
+
+    show(x: number, y: number) {
+        ContextMenuComponent.show(this.appContextMenu, this.viewContainer, x, y);
     }
 }

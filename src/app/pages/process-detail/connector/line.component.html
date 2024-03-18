@@ -1,0 +1,10 @@
+<svg:g>
+      <path [class.hovered]="hovered" fill="none" [attr.d]="path()" />
+      <path class="moving" [class.hovered]="hovered" fill="none" [attr.d]="path()" />
+      <path class="container"
+            fill="none"
+            [attr.d]="path()"
+            (pointerenter)="hovered = true"
+            (pointerleave)="hovered = false"
+            [appContextMenu]="contextOptions" />
+      <svg:g>

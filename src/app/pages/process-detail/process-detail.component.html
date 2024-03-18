@@ -1,0 +1,39 @@
+<div class="canvas"
+     (appDrag)="onDrag($event)" [scroll]="true" scrollGlobal
+     (appZoom)="onZoom($event)" zoomGlobal
+     [style.backgroundSizeX.px]="gridSize"
+     [style.backgroundSizeX.px]="gridSize"
+     [style.backgroundPositionX.px]="x()"
+     [style.backgroundPositionY.px]="y()"
+     [appContextMenu]="contextOptions"
+     (dblclick)="ref.show($event.clientX, $event.clientY)" #ref="appContextMenu"></div>
+
+<!-- Horizontal areas -->
+<div class="absolute" [style.top.px]="y()" (appDrag)="onDrag($event)" [style.scale]="z">
+    @for (area of areasHorizontal(); track area) {
+    <app-area [area]="area" (changed)="saveState()" />
+    }
+</div>
+
+<!-- Vertical areas -->
+<div class="absolute" [style.left.px]="x()" (appDrag)="onDrag($event)" [style.scale]="z">
+    @for (area of areasVertical(); track area) {
+    <app-area [area]="area" (changed)="saveState()" />
+    }
+</div>
+
+<app-line-manager [x]="x()" [y]="y()" />
+
+<!-- Blocks -->
+<div class="absolute" [style.left.px]="x()" [style.top.px]="y()" [style.scale]="z">
+    @for (block of blocks(); track block) {
+    <app-block [block]="block" (removed)="removeBlock(block)" (changed)="saveState()" />
+    }
+</div>
+
+<!-- UI -->
+<app-button class="add-button" (clicked)="createCMVisible=true" shortcut="ctrl+n">Add</app-button>
+
+@if (createCMVisible) {
+<app-context-menu [options]="contextOptions" (closed)="createCMVisible = false" class="create-cm" />
+}

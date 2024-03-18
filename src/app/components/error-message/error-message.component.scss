@@ -11,7 +11,7 @@
 .background {
     padding: 1rem;
     border-radius: 0.2rem;
-    background-color: colors.$danger;
+    background-color: var(--danger);
     color: white;
     box-shadow: 0 4px 8px rgba(255, 0, 0, 0.678);
 }

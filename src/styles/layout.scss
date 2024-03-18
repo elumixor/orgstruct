@@ -1,12 +1,10 @@
-$borderSmall: 10px;
-$borderMedium: 15px;
+:root {
+    --border-radius: 10px;
+    --border-radius-small: 5px;
+    --border-radius-large: 15px;
 
-.rounded-small {
-    border-radius: $borderSmall;
-}
-
-.rounded-medium {
-    border-radius: $borderMedium;
+    --scale-action: scale(1.02);
+    --duration-action: 0.3s;
 }
 
 @mixin space($kind, $size) {
@@ -92,11 +90,15 @@ $borderMedium: 15px;
 @include margins;
 
 
-
-
 .app-centered {
     width: 100%;
     max-width: 600px;
     padding: 35px 35px;
     margin: 35px auto;
+}
+
+@mixin circle($size) {
+    width: $size;
+    height: $size;
+    border-radius: 50%;
 }

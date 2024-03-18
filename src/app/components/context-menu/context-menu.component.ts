@@ -1,90 +1,76 @@
-import { animate, query, stagger, style, transition, trigger } from "@angular/animations";
-import { Component, ElementRef, HostListener, ViewChild } from "@angular/core";
-import { ClickDirective } from "../click.directive";
-import { WithIconComponent } from "../with-icon/with-icon.component";
-import type { IContextMenuOption } from "./context-menu-option";
+import {
+    Component,
+    ElementRef,
+    EventEmitter,
+    HostBinding,
+    Input,
+    Output,
+    ViewContainerRef,
+    inject,
+    type OnInit,
+} from "@angular/core";
+import { appear } from "@animations";
+import { ClickDirective } from "@components/click.directive";
+import { ShortcutComponent } from "../shortcut.component";
+import { WithIconComponent } from "../with-icon.component";
+import type { ContextOptions, IContextMenuOption } from "./context-menu-option";
+import { ContextMenuRootDirective } from "./context-menu-root.directive";
 
 @Component({
     selector: "app-context-menu",
     standalone: true,
-    imports: [ClickDirective, WithIconComponent],
+    imports: [WithIconComponent, ShortcutComponent, ClickDirective],
     templateUrl: "./context-menu.component.html",
     styleUrl: "./context-menu.component.scss",
-    animations: [
-        trigger("appear", [
-            transition("* => *", [
-                // each time the binding value changes
-                query(
-                    ":leave",
-                    [
-                        stagger("0.1s", [
-                            animate(
-                                "0.2s",
-                                style({ opacity: 0, transform: "translateX(30px) translateY(-10px) rotateY(-10deg)" }),
-                            ),
-                        ]),
-                    ],
-                    { optional: true },
-                ),
-                query(
-                    ":enter",
-                    [
-                        style({
-                            opacity: 0,
-                            transform: "translateX(-30px) translateY(-10px) rotateY(0deg)",
-                        }),
-                        stagger("0.05s", [
-                            animate(
-                                "0.2s ease-in-out",
-                                style({
-                                    opacity: 1,
-                                    transform: "translateX(-10px) translateY(-10px) rotateY(-5deg)",
-                                }),
-                            ),
-                        ]),
-                    ],
-                    {
-                        optional: true,
-                    },
-                ),
-            ]),
-        ]),
-    ],
+    animations: [appear("appear")],
 })
-export class ContextMenuComponent {
-    visible = true;
-    options: IContextMenuOption[] = [];
+export class ContextMenuComponent implements OnInit {
+    @Input({ required: true }) options!: ContextOptions;
+    @HostBinding("style.left.px") @Input() x = 0;
+    @HostBinding("style.top.px") @Input() y = 0;
 
-    @ViewChild("containerRef") private readonly containerRef?: ElementRef<HTMLDivElement>;
+    @Output() readonly closed = new EventEmitter<void>();
 
-    private _x = 0;
-    private _y = 0;
+    private readonly element = inject<ElementRef<HTMLElement>>(ElementRef);
+    private readonly root = inject(ContextMenuRootDirective);
 
-    get left() {
-        return `${this._x}px`;
+    onPointerDown(e: PointerEvent) {
+        if (e.composedPath().includes(this.element.nativeElement)) return;
+
+        e.preventDefault();
+        e.stopPropagation();
+
+        this.closed.emit();
     }
 
-    get top() {
-        return `${this._y}px`;
-    }
-
-    show(x: number, y: number, options: IContextMenuOption[]) {
-        this._x = x;
-        this._y = y;
-        this.options = options;
-        this.visible = true;
-    }
-
-    selectOption(option: IContextMenuOption) {
+    action(option: IContextMenuOption) {
         option.action();
-        this.visible = false;
+        this.closed.emit();
     }
 
-    @HostListener("window:pointerdown", ["$event"])
-    closeContextMenu(e: PointerEvent) {
-        const nativeElement = this.containerRef?.nativeElement;
-        if (!nativeElement || !e.composedPath().includes(this.containerRef.nativeElement) || e.button !== 2) {
-            this.visible = false;
-        }
+    ngOnInit() {
+        const container = this.root.elementRef.nativeElement as HTMLElement;
+        const us = this.element.nativeElement;
+        container.appendChild(us);
+
+        // When we are added in some pointerdown event, this gets propagated and captured by this component
+        // We use this hack to only make the destruction available one tick after we are added to the DOM
+        setTimeout(() => this.addCallbacks());
+    }
+
+    private addCallbacks() {
+        document.addEventListener("pointerdown", this.onPointerDown.bind(this));
+        document.addEventListener("keydown", (e) => {
+            if (e.key === "Escape") this.closed.emit();
+        });
+    }
+
+    static show(options: ContextOptions, viewContainer: ViewContainerRef, x?: number, y?: number) {
+        const component = viewContainer.createComponent(ContextMenuComponent);
+        const { instance } = component;
+        instance.options = options;
+        if (x !== undefined) instance.x = x + 5;
+        if (y !== undefined) instance.y = y;
+        instance.closed.subscribe(() => component.destroy());
     }
 }

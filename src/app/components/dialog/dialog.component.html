@@ -1,0 +1,18 @@
+<ng-content></ng-content>
+
+@if (isShown) {
+<div class="overlay" (click)="resolved.emit(false)" @fade></div>
+<div class="centered">
+    <div class="box" @appear (@appear.done)="onAppeared($event)">
+        @if (icon) {
+        <app-icon class="icon" [src]="icon" />
+        }
+        <div class="title">{{title}}</div>
+        <input type="text" [(ngModel)]="value" #input />
+        <div class="buttons">
+            <app-button (clicked)="resolved.emit(false)" shortcut="esc">Cancel</app-button>
+            <app-button (clicked)="resolved.emit(true)" shortcut="enter">Confirm</app-button>
+        </div>
+    </div>
+</div>
+}

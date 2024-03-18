@@ -1,0 +1,17 @@
+@if (area.isVertical) {
+<div class="dragger vertical" (appDrag)="drag($event)"></div>
+<div class="dragger vertical" (appDrag)="drag($event, true)"></div>
+}
+
+@if (!area.isVertical) {
+<div class="dragger horizontal" (appDrag)="drag($event)"></div>
+<div class="dragger horizontal" (appDrag)="drag($event, true)"></div>
+}
+
+<div class="title"
+     [class.horizontal]="!area.isVertical"
+     (appDrag)="dragPosition($event)"
+     (dblclick)="rename()"
+     [appContextMenu]="contextOptions">
+    {{ area.title }}
+</div>

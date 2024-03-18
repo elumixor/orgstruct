@@ -7,12 +7,12 @@ import { signal } from "@angular/core";
 export function signalArray<T = unknown>(equalityOp = (a: unknown, b: unknown) => a === b) {
     const sig = signal([] as T[]);
     const remove = (value: T) => sig.update((current) => current.filter((item) => !equalityOp(item, value)));
-    const add = (...value: T[]) => sig.update((items) => [...items, ...value]);
+    const push = (...value: T[]) => sig.update((items) => [...items, ...value]);
     Reflect.defineProperty(sig, "remove", { value: remove, writable: true });
-    Reflect.defineProperty(sig, "add", { value: add, writable: true });
+    Reflect.defineProperty(sig, "push", { value: push, writable: true });
     return sig as typeof sig & {
         remove: typeof remove;
-        add: typeof add;
+        push: typeof push;
     };
 }
 

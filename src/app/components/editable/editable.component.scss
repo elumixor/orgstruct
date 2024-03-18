@@ -35,7 +35,7 @@ textarea {
     text-align: unset;
 
     &::placeholder {
-        color: colors.$white;
+        color: var(--white);
         opacity: 0.5;
         font-style: italic;
     }

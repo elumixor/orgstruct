@@ -1,4 +1,4 @@
-<div [appContextMenu]="contextOptions()">
+<div>
     <app-editable class="h3"
                   [(text)]="division.title"></app-editable>
     <app-editable [(text)]="division.description"></app-editable>
@@ -7,7 +7,6 @@
         <div *appLazyFor="let office of offices(); type: 'office'; let officeProxy = proxy;"
              class="block"
              (appClick)="cardsManager.push(officeRef, { from: blockRef })"
-             [appContextMenu]="contextOptions(officeProxy)"
              #blockRef>
 
             <ng-template appCardContent

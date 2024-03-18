@@ -1,10 +1,9 @@
-<app-error-message>
-    <app-context-menu>
-        <div class="container">
-            <!-- <app-nav-bar></app-nav-bar> -->
-            <div class="content">
-                <router-outlet></router-outlet>
-            </div>
+<app-background />
+
+<app-dialog>
+    <div class="container" appContextMenuRoot>
+        <div class="content">
+            <router-outlet></router-outlet>
         </div>
-    </app-context-menu>
-</app-error-message>
+    </div>
+</app-dialog>
