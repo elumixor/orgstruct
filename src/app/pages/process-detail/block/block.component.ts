@@ -7,15 +7,23 @@ import {
     Input,
     Output,
     ViewChild,
+    effect,
     inject,
     signal,
     type OnInit,
     type WritableSignal,
-    effect,
 } from "@angular/core";
-import { ContextMenuDirective, ContextOptions, DragDirective, IconComponent, type IDragEvent } from "@components";
+import { appear } from "@animations";
+import {
+    ClickOutsideDirective,
+    ContextMenuDirective,
+    ContextOptions,
+    DragDirective,
+    EditableComponent,
+    IconComponent,
+    type IDragEvent,
+} from "@components";
 import { Point, snappedVal } from "@utils";
-import { appear } from "../../../animations/appear";
 import type { IBlock } from "../block";
 import { ConnectorService, type ConnectionType, type ConstructionConnectionType } from "../connector/connector.service";
 import { ProcessDetailComponent } from "../process-detail.component";
@@ -23,7 +31,7 @@ import { ProcessDetailComponent } from "../process-detail.component";
 @Component({
     selector: "app-block",
     standalone: true,
-    imports: [DragDirective, ContextMenuDirective, IconComponent],
+    imports: [DragDirective, ContextMenuDirective, IconComponent, EditableComponent, ClickOutsideDirective],
     templateUrl: "./block.component.html",
     styleUrl: "./block.component.scss",
     animations: [
@@ -37,7 +45,9 @@ export class BlockComponent implements OnInit {
 
     @Output() readonly removed = new EventEmitter();
     @Output() readonly changed = new EventEmitter();
+    @Output() readonly selected = new EventEmitter<boolean>();
 
+    isEditing = false;
     hovered = false;
 
     @ViewChild("inputAnchor") private readonly inputAnchor!: ElementRef<HTMLElement>;
@@ -75,6 +85,10 @@ export class BlockComponent implements OnInit {
         effect(() => {
             const lines = this.connectorService.lines();
             this.anchors = this.anchors.filter((a) => lines.some((line) => line.id === a.lineId));
+        });
+
+        this.selected.subscribe((isEditing) => {
+            this.isEditing = isEditing;
         });
     }
 
@@ -120,6 +134,14 @@ export class BlockComponent implements OnInit {
         const endPoint = Point(endX, endY);
 
         this.connectorService.onLineStarted(this, anchorType, startPoint, endPoint);
+    }
+
+    select() {
+        this.selected.emit(true);
+    }
+
+    deselect() {
+        this.selected.emit(false);
     }
 
     @HostListener("pointerup", ["$event"])

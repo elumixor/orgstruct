@@ -1,10 +1,10 @@
-import { Component, EventEmitter, HostBinding, Input, Output, inject, type OnInit } from "@angular/core";
+import { Component, EventEmitter, HostBinding, Input, Output, inject, type OnInit, Type } from "@angular/core";
 import { ContextMenuDirective, ContextOptions, DialogComponent, DragDirective, type IDragEvent } from "@components";
 import { snappedVal } from "@utils";
 import type { IArea } from "../block";
 import { ProcessDetailComponent } from "../process-detail.component";
 
-const ColorComponent: unknown = undefined as unknown;
+const ColorComponent: Type<unknown> = undefined as unknown as Type<unknown>;
 
 @Component({
     selector: "app-area",
@@ -32,7 +32,7 @@ export class AreaComponent implements OnInit {
             shortcut: "Del",
         })
         .with("Rename", () => this.rename(), { icon: "edit.svg", shortcut: "r" })
-        .withNested("Color", new ContextOptions().withComponent(ColorComponent), { shortcut: "c" });
+        .withNested("Color", new ContextOptions().withComponent("Color", ColorComponent), { shortcut: "c" });
 
     @HostBinding("class.horizontal") get isHorizontal() {
         return !this.area.isVertical;

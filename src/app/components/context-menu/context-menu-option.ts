@@ -1,48 +1,50 @@
+import type { Type } from "@angular/core";
+
 export type Flavor = "default" | "danger" | "warning";
 export type Action = () => void | PromiseLike<void>;
 
-export interface IContextMenuOption {
+export interface IBaseContextMenuOption {
     title: string;
     description?: string;
     icon?: string;
     flavor?: Flavor;
     shortcut?: string;
-    action: Action;
 }
 
-export class ContextOptions {
-    options: IContextMenuOption[] = [];
-    with(title: string, action: Action, options?: Omit<IContextMenuOption, "title" | "action">) {
-        this.options.push({
-            title,
-            action,
-            ...options,
-        });
+export interface ContextMenuOptionAction extends IBaseContextMenuOption {
+    action: Action;
+}
+export interface ContextMenuOptionNested extends IBaseContextMenuOption {
+    nested: ContextOptions;
+}
+export interface ContextMenuOptionComponent extends IBaseContextMenuOption {
+    component: Type<unknown>;
+}
 
+export type ContextMenuOption = ContextMenuOptionAction | ContextMenuOptionNested | ContextMenuOptionComponent;
+
+export class ContextOptions {
+    options: ContextMenuOption[] = [];
+    with(title: string, action: Action, options?: Omit<IBaseContextMenuOption, "title">) {
+        this.options.push({ title, action, ...options });
         return this;
     }
 
-    withDanger(title: string, action: Action, options?: Omit<IContextMenuOption, "title" | "action" | "flavor">) {
+    withDanger(title: string, action: Action, options?: Omit<IBaseContextMenuOption, "title" | "flavor">) {
         return this.with(title, action, { flavor: "danger", ...options });
     }
 
-    withWarning(title: string, action: Action, options?: Omit<IContextMenuOption, "title" | "action" | "flavor">) {
+    withWarning(title: string, action: Action, options?: Omit<IBaseContextMenuOption, "title" | "flavor">) {
         return this.with(title, action, { flavor: "warning", ...options });
     }
 
-    withNested(title: string, nestedOptions: ContextOptions, options?: Omit<IContextMenuOption, "title" | "action">) {
-        console.warn("Not implemented");
-        // this.options.push({
-        //     title,
-        //     action: () => nestedOptions,
-        //     ...options,
-        // });
-
+    withNested(title: string, nested: ContextOptions, options?: Omit<IBaseContextMenuOption, "title">) {
+        this.options.push({ title, nested, ...options });
         return this;
     }
 
-    withComponent(component: unknown) {
-        console.warn("Not implemented");
+    withComponent(title: string, component: Type<unknown>, options?: Omit<IBaseContextMenuOption, "title">) {
+        this.options.push({ title, component, ...options });
         return this;
     }
 }

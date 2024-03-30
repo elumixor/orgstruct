@@ -7,7 +7,7 @@ import { Directive, EventEmitter, HostListener, Output } from "@angular/core";
 export class ClickDirective {
     @Output() appClick = new EventEmitter<PointerEvent>();
 
-    @HostListener("pointerdown", ["$event"])
+    @HostListener("pointerup", ["$event"])
     onPointerDown(e: PointerEvent) {
         if (e.button !== 0) return;
         this.appClick.emit(e);

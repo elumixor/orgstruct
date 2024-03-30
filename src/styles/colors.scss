@@ -6,6 +6,10 @@
     @return mix($color, black $amount);
 }
 
+@function lighten($color, $amount: 10%) {
+    @return mix($color, white $amount);
+}
+
 @function transparentize($color, $amount: 50%) {
     @return mix($color $amount, transparent);
 }

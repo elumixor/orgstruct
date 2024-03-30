@@ -10,6 +10,7 @@ import {
     inject,
     type OnInit,
     booleanAttribute,
+    type OnChanges,
 } from "@angular/core";
 
 export interface IDragEvent {
@@ -23,36 +24,50 @@ export interface IDragEvent {
     selector: "[appDrag]",
     standalone: true,
 })
-export class DragDirective implements OnInit {
+export class DragDirective implements OnInit, OnChanges {
     private static currentDrag?: DragDirective;
 
-    @Output() appDrag = new EventEmitter<IDragEvent>();
-    @Output() dragStart = new EventEmitter();
-    @Output() dragEnd = new EventEmitter();
+    @Output() readonly clicked = new EventEmitter<PointerEvent>();
+    @Output() readonly appDrag = new EventEmitter<IDragEvent>();
+    @Output() readonly dragStart = new EventEmitter();
+    @Output() readonly dragEnd = new EventEmitter();
     @Input() scroll = false;
+    @Input() dragEnabled = true;
     @Input({ transform: booleanAttribute }) scrollGlobal?: unknown;
     @Input() propagate = false;
 
     private x = 0;
     private y = 0;
-    private startX = 0;
-    private startY = 0;
+    private currentX = 0;
+    private currentY = 0;
+    private moved = false;
     private isDragging = false;
 
     private readonly elementRef = inject<ElementRef<HTMLElement>>(ElementRef);
     private readonly zone = inject(NgZone);
     private readonly platformId = inject(PLATFORM_ID);
 
+    ngOnChanges() {
+        this.elementRef.nativeElement.style.cursor = this.dragEnabled ? "grab" : "auto";
+    }
+
     ngOnInit() {
         if (!isPlatformBrowser(this.platformId)) return;
 
         this.zone.runOutsideAngular(() => {
             this.elementRef.nativeElement.addEventListener("pointerdown", (e) => {
+                if (!this.dragEnabled) return;
                 if (e.button !== 0) return;
                 this.dragStarted(e.clientX, e.clientY);
             });
-            window.addEventListener("pointerup", () => this.dragEnded());
-            window.addEventListener("pointermove", (e) => this.dragMove(e.clientX, e.clientY));
+            window.addEventListener("pointerup", (e) => {
+                if (!this.dragEnabled) return;
+                this.dragEnded(e);
+            });
+            window.addEventListener("pointermove", (e) => {
+                if (!this.dragEnabled) return;
+                this.dragMove(e.clientX, e.clientY);
+            });
 
             if (!this.scroll) return;
 
@@ -61,6 +76,7 @@ export class DragDirective implements OnInit {
             target.addEventListener(
                 "wheel",
                 (e) => {
+                    if (!this.dragEnabled) return;
                     const { ctrlKey, deltaX, deltaY } = e as WheelEvent;
                     if (ctrlKey) return; // zoom event
                     this.change(-deltaX, -deltaY);
@@ -75,28 +91,37 @@ export class DragDirective implements OnInit {
         if (DragDirective.currentDrag) return;
         DragDirective.currentDrag = this;
 
-        this.startX = x;
-        this.startY = y;
+        this.currentX = x;
+        this.currentY = y;
         this.isDragging = true;
 
         this.zone.run(() => this.dragStart.emit());
     }
 
-    private dragEnded() {
+    private dragEnded(e: PointerEvent) {
+        if (!this.isDragging) return;
+
         this.isDragging = false;
         DragDirective.currentDrag = undefined;
 
-        this.zone.run(() => this.dragEnd.emit());
+        if (this.moved) {
+            e.stopPropagation();
+            this.zone.run(() => this.dragEnd.emit());
+        } else this.zone.run(() => this.clicked.emit(e));
+
+        this.moved = false;
     }
 
     private dragMove(x: number, y: number) {
         if (!this.isDragging) return;
 
-        const dx = x - this.startX;
-        const dy = y - this.startY;
+        this.moved = true;
 
-        this.startX = x;
-        this.startY = y;
+        const dx = x - this.currentX;
+        const dy = y - this.currentY;
+
+        this.currentX = x;
+        this.currentY = y;
 
         this.change(dx, dy);
     }

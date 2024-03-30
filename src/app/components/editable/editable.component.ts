@@ -9,10 +9,10 @@ import { FormsModule } from "@angular/forms";
     styleUrl: "./editable.component.scss",
 })
 export class EditableComponent {
+    @Output() readonly textChange = new EventEmitter<string>();
     @Input() placeholder = "Placeholder text...";
-    @Output() textChange = new EventEmitter<string>();
+    @Input() enabled = true;
     focused = false;
-
     @ViewChild("inputRef") private readonly inputRef?: ElementRef<HTMLInputElement>;
 
     private _text?: string;
@@ -37,6 +37,7 @@ export class EditableComponent {
     }
 
     onInput(event: Event) {
+        if (!this.enabled) return;
         this._text = (event.target as HTMLInputElement).value;
         this.sync();
     }

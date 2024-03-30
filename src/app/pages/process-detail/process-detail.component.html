@@ -11,14 +11,14 @@
 <!-- Horizontal areas -->
 <div class="absolute" [style.top.px]="y()" (appDrag)="onDrag($event)" [style.scale]="z">
     @for (area of areasHorizontal(); track area) {
-    <app-area [area]="area" (changed)="saveState()" />
+    <app-area [area]="area" (changed)="saveState()" (removed)="removeArea(area)" />
     }
 </div>
 
 <!-- Vertical areas -->
 <div class="absolute" [style.left.px]="x()" (appDrag)="onDrag($event)" [style.scale]="z">
     @for (area of areasVertical(); track area) {
-    <app-area [area]="area" (changed)="saveState()" />
+    <app-area [area]="area" (changed)="saveState()" (removed)="removeArea(area)" />
     }
 </div>
 

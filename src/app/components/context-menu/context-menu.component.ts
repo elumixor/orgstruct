@@ -13,7 +13,13 @@ import { appear } from "@animations";
 import { ClickDirective } from "@components/click.directive";
 import { ShortcutComponent } from "../shortcut.component";
 import { WithIconComponent } from "../with-icon.component";
-import type { ContextOptions, IContextMenuOption } from "./context-menu-option";
+import type {
+    ContextMenuOption,
+    ContextMenuOptionAction,
+    ContextMenuOptionComponent,
+    ContextMenuOptionNested,
+    ContextOptions,
+} from "./context-menu-option";
 import { ContextMenuRootDirective } from "./context-menu-root.directive";
 
 @Component({
@@ -43,9 +49,21 @@ export class ContextMenuComponent implements OnInit {
         this.closed.emit();
     }
 
-    action(option: IContextMenuOption) {
-        option.action();
+    action(option: ContextMenuOptionAction) {
+        void option.action();
         this.closed.emit();
+    }
+
+    isOptionAction(option: ContextMenuOption): option is ContextMenuOptionAction {
+        return "action" in option;
+    }
+
+    isOptionNested(option: ContextMenuOption): option is ContextMenuOptionNested {
+        return "nested" in option;
+    }
+
+    isOptionComponent(option: ContextMenuOption): option is ContextMenuOptionComponent {
+        return "component" in option;
     }
 
     ngOnInit() {

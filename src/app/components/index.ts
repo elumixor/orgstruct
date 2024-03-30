@@ -16,3 +16,4 @@ export * from "./search-overlay/search-overlay.component";
 export * from "./shortcut.component";
 export * from "./with-icon.component";
 export * from "./zoom.directive";
+export * from "./click-outside.directive";

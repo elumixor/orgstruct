@@ -1,5 +1,5 @@
 import { Component, Input, inject } from "@angular/core";
-import { ClickDirective, EditableComponent, LazyForDirective, type IContextMenuOption } from "@components";
+import { ClickDirective, EditableComponent, LazyForDirective, type ContextMenuOption } from "@components";
 import { newBranch, type MetaPlain } from "@domain";
 import { DataService, type Lazy } from "@services";
 import { CardContentDirective, CardsManagerComponent } from "../../cards-manager";
@@ -28,7 +28,7 @@ export class OfficeComponent {
     }
 
     contextOptions(branch?: Lazy<"branch">) {
-        const options: IContextMenuOption[] = [
+        const options: ContextMenuOption[] = [
             {
                 title: "Add branch",
                 action: () => this.branches.add(this.proxy.lazifyFrom("branch", newBranch(this.office))),

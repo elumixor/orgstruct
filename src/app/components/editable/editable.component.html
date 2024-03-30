@@ -1,7 +1,5 @@
-<label class="background"
-       [class.focused]="focused">
-    <div class="grow-wrap"
-         [attr.data-replicated-value]="text">
+<label [class.focused]="focused" [class.disabled]="!enabled">
+    <div class="grow-wrap" [attr.data-replicated-value]="text">
         <textarea rows="1"
                   wrap="soft"
                   [(ngModel)]="text"
@@ -10,6 +8,7 @@
                   (blur)="blur()"
                   (keydown.escape)="blur()"
                   (input)="onInput($event)"
+                  [disabled]="!enabled"
                   #inputRef></textarea>
     </div>
 </label>

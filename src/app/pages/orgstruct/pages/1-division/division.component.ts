@@ -1,5 +1,5 @@
 import { Component, Input, inject } from "@angular/core";
-import { ClickDirective, EditableComponent, LazyForDirective, type IContextMenuOption } from "@components";
+import { ClickDirective, EditableComponent, LazyForDirective, type ContextMenuOption } from "@components";
 import { newOffice, type MetaPlain } from "@domain";
 import { DataService, syncArrays, type Lazy } from "@services";
 import { CardContentDirective } from "../../cards-manager/card-content.directive";
@@ -41,7 +41,7 @@ export class DivisionComponent {
     }
 
     contextOptions(office?: Lazy<"office">) {
-        const options: IContextMenuOption[] = [
+        const options: ContextMenuOption[] = [
             {
                 title: "Add office",
                 action: () => this.offices.add(this.data.lazifyFrom("office", newOffice(this.division))),

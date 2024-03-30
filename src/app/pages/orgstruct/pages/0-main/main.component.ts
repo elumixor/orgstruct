@@ -1,5 +1,5 @@
 import { Component, inject } from "@angular/core";
-import { ClickDirective, EditableComponent, LazyForDirective, type IContextMenuOption } from "@components";
+import { ClickDirective, EditableComponent, LazyForDirective, type ContextMenuOption } from "@components";
 import { DataService, NetworkService, type Lazy } from "@services";
 import { CardContentDirective, CardsManagerComponent } from "../../cards-manager";
 // import { ConnectableDirective, ConnectorComponent } from "../../connector";
@@ -38,7 +38,7 @@ export class MainComponent {
     description = "We free";
 
     contextOptions(division?: Lazy<"division">) {
-        const options: IContextMenuOption[] = [
+        const options: ContextMenuOption[] = [
             {
                 title: "Add division",
                 action: () => this.divisions.add(this.data.lazifyFrom("division", newDivision())),

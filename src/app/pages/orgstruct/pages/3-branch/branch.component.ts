@@ -1,5 +1,5 @@
 import { Component, Input, inject } from "@angular/core";
-import { EditableComponent, LazyForDirective, type IContextMenuOption } from "@components";
+import { EditableComponent, LazyForDirective, type ContextMenuOption } from "@components";
 import { TaskComponent } from "../../items/task/task.component";
 import { DataService, type Lazy } from "@services";
 import { newTask, type MetaPlain } from "@domain";
@@ -27,7 +27,7 @@ export class BranchComponent {
     }
 
     contextOptions(task?: Lazy<"task">) {
-        const options: IContextMenuOption[] = [
+        const options: ContextMenuOption[] = [
             {
                 title: "Add task",
                 action: () => this.tasks.add(this.data.lazifyFrom("task", newTask(this.branch))),

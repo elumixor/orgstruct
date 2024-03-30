@@ -1,5 +1,6 @@
 <div class="container" @appear>
-    @for (option of options.options; track $index) {
+    <!-- @for (option of options.options; track $index) {
+    @if (isOptionAction(option)) {
     <app-with-icon
                    class="context-option flavor-{{ option.flavor }}"
                    (appClick)="action(option)"
@@ -9,5 +10,16 @@
             @if (option.shortcut) { <app-shortcut [shortcut]="option.shortcut" (pressed)="action(option)" /> }
         </div>
     </app-with-icon>
-    }
+    } @else if (isOptionNested(option)) { -->
+    <!-- <app-with-icon
+                   class="context-option flavor-{{ option.flavor }}"
+                   (pointerenter)="openNested($event, option)"
+                   (pointerleave)="closeNested($event, option)"
+                   [icon]="option.icon"> -->
+    <!-- <div class="option-content">
+            {{ option.title }} -->
+    <!-- <app-icon class="icon" src="arrow-right.svg" /> -->
+    <!-- </div>
+    </app-with-icon> -->
+    <!-- } -->
 </div>

@@ -1,22 +1,25 @@
 <div
-     [appContextMenu]="contextOptions"
      class="container"
+     [class.editing]="isEditing"
+     [appContextMenu]="contextOptions"
      (appDrag)="onDrag($event)"
+     [dragEnabled]="!isEditing"
+     (clicked)="select()"
      (pointerenter)="hovered = true"
      (pointerleave)="hovered = false"
+     (appClickOutside)="deselect()"
      #container>
     <div class="title">
-        {{block.title}}
+        <app-editable [(text)]="block.title" [enabled]="isEditing" (textChange)="changed.emit()" />
     </div>
+    @if (block.description || isEditing) {
     <div class="description">
-        Short description of the block...
+        <app-editable [(text)]="block.description" [enabled]="isEditing" placeholder="Add description..."
+                      (textChange)="changed.emit()" />
     </div>
+    }
 
-    <!-- <app-icon class="icon input" src="input.svg" />
-    <app-icon class="icon event" src="event.svg" />
-    <app-icon class="icon output" src="output.svg" /> -->
-
-    @if (hovered) {
+    @if (hovered && !isEditing) {
     <div @appear-left class="section outputs ">
         <div class="add-container" (pointerdown)="startLine($event, 'output')">
             <app-icon class="icon inline-block" src="block-output.svg" />
@@ -41,13 +44,13 @@
     </div>
     }
 
-    <div class="anchor right" [class.hidden]="!hasOutputs" #outputAnchor>
+    <div class="anchor right" [class.hidden]="isEditing || !hasOutputs" #outputAnchor>
         <div class="icon output"></div>
     </div>
-    <div class="anchor left" [class.hidden]="!hasInputs" #inputAnchor>
+    <div class="anchor left" [class.hidden]="isEditing || !hasInputs" #inputAnchor>
         <div class="icon input"></div>
     </div>
-    <div class="anchor bottom" [class.hidden]="!hasEvents" #eventAnchor>
+    <div class="anchor bottom" [class.hidden]="isEditing || !hasEvents" #eventAnchor>
         <div class="icon event"></div>
     </div>
 </div>

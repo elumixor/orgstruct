@@ -26,7 +26,7 @@ $border-small: 1px solid colors.transparentize(var(--fg-color), 50%);
     cursor: grab;
     position: relative;
     box-sizing: border-box;
-    padding: .5em;
+    padding: 0.5em;
     transition: all var(--duration-action);
 
     &:hover {
@@ -39,12 +39,20 @@ $border-small: 1px solid colors.transparentize(var(--fg-color), 50%);
     .title {
         color: var(--black);
         letter-spacing: 0.5px;
-        margin-bottom: .5em;
     }
 
     .description {
+        margin-top: 0.5em;
         color: var(--grey);
         font-size: 14px;
+    }
+
+    &.editing {
+        transform: scale(1.1);
+        background-color: colors.lighten(var(--secondary), 80%);
+        border-color: var(--secondary);
+        padding: 0.8em 1em 1.2em;
+        width: 250px;
     }
 }
 

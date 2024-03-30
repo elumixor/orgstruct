@@ -9,6 +9,7 @@ import {
     type AfterViewInit,
     type OnDestroy,
     HostListener,
+    type AfterViewChecked,
 } from "@angular/core";
 import {
     ButtonComponent,
@@ -47,7 +48,7 @@ import { LineManagerComponent } from "./connector/line-manager.component";
     templateUrl: "./process-detail.component.html",
     styleUrl: "./process-detail.component.scss",
 })
-export class ProcessDetailComponent implements AfterViewInit, OnDestroy {
+export class ProcessDetailComponent implements AfterViewInit, AfterViewChecked, OnDestroy {
     private readonly connectorService = inject(ConnectorService);
     private readonly processesService = inject(ProcessesService);
     private readonly changeDetector = inject(ChangeDetectorRef);
@@ -93,19 +94,28 @@ export class ProcessDetailComponent implements AfterViewInit, OnDestroy {
         this.x.update((x) => x + dx);
         this.y.update((y) => y + dy);
     }
+
     onZoom({ z }: IZoomEvent) {
         this.z = z;
     }
+
     addBlock() {
         this.blocks.push({ x: 0, y: 0, title: "New block", id: randomString(10) });
     }
+
     addArea(isVertical: boolean) {
         this.areas.push({ x: 0, y: 0, width: 100, height: 100, title: "New area", isVertical });
     }
+
     removeBlock(block: IBlock) {
         this.blocks.remove(block);
         this.connectorService.removeBlock(block.id);
     }
+
+    removeArea(area: IArea) {
+        this.areas.remove(area);
+    }
+
     saveState() {
         this.blocks.save();
         this.areas.save();
@@ -128,10 +138,6 @@ export class ProcessDetailComponent implements AfterViewInit, OnDestroy {
             ...currentLine,
             targetBlockId: newBlock.id,
         };
-        // this.connectorService.addLine({
-
-        // });
-        // const newBlock = this.blocks().last;
     }
 
     private newConnection?: {
