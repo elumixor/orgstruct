@@ -1,5 +1,5 @@
 {
-    "name": "angular-boilerplate",
+    "name": "orgstruct",
     "version": "0.0.0",
     "type": "module",
     "scripts": {
@@ -12,7 +12,7 @@
         "db:generate": "drizzle-kit generate:pg",
         "db:migrate": "bun run ./src/server/db/migrate.ts",
         "db:update": "bun run db:generate && bun run db:migrate",
-        "start": "bun run dist/angular-boilerplate/server/server.mjs"
+        "start": "bun run dist/orgstruct/server/server.mjs"
     },
     "private": true,
     "dependencies": {

@@ -3,7 +3,7 @@
     "version": 1,
     "newProjectRoot": "projects",
     "projects": {
-        "angular-boilerplate": {
+        "orgstruct": {
             "projectType": "application",
             "schematics": {
                 "@schematics/angular:component": {
@@ -30,7 +30,7 @@
                 "build": {
                     "builder": "@ngx-env/builder:application",
                     "options": {
-                        "outputPath": "dist/angular-boilerplate",
+                        "outputPath": "dist/orgstruct",
                         "index": "src/client/index.html",
                         "browser": "src/client/main.ts",
                         "polyfills": ["zone.js"],
@@ -72,16 +72,16 @@
                 "serve": {
                     "builder": "@ngx-env/builder:dev-server",
                     "options": {
-                        "browserTarget": "angular-boilerplate:build",
+                        "browserTarget": "orgstruct:build",
                         "host": "0.0.0.0",
                         "port": 4200
                     },
                     "configurations": {
                         "production": {
-                            "buildTarget": "angular-boilerplate:build:production"
+                            "buildTarget": "orgstruct:build:production"
                         },
                         "development": {
-                            "buildTarget": "angular-boilerplate:build:development"
+                            "buildTarget": "orgstruct:build:development"
                         }
                     },
                     "defaultConfiguration": "development"
@@ -89,7 +89,7 @@
                 "extract-i18n": {
                     "builder": "@ngx-env/builder:extract-i18n",
                     "options": {
-                        "buildTarget": "angular-boilerplate:build"
+                        "buildTarget": "orgstruct:build"
                     }
                 },
                 "lint": {
