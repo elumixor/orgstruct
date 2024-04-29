@@ -22,18 +22,16 @@
         "verbatimModuleSyntax": true,
         "lib": ["ES2022", "dom"],
         "paths": {
-            "@styles/*": ["./src/styles/*"],
-            "@utils": ["./src/app/utils"],
-            "@utils/*": ["./src/app/utils/*"],
-            "@domain": ["./src/app/domain"],
-            "@domain/*": ["./src/app/domain/*"],
-            "@components": ["./src/app/components"],
-            "@components/*": ["./src/app/components/*"],
-            "@pages": ["./src/app/pages"],
-            "@pages/*": ["./src/app/pages/*"],
-            "@services": ["./src/app/services"],
-            "@services/*": ["./src/app/services/*"],
-            "@animations": ["./src/app/animations"]
+            "@styles/*": ["./src/client/styles/*"],
+            "@shared": ["./src/shared"],
+            "@shared/*": ["./src/shared/*"],
+            "@utils": ["./src/shared/utils"],
+            "@utils/*": ["./src/shared/utils/*"],
+            "@domain": ["./src/shared/domain"],
+            "@domain/*": ["./src/shared/domain/*"],
+            "@services": ["./src/client/app/services"],
+            "@services/*": ["./src/client/app/services/*"],
+            "@animations": ["./src/client/app/animations"]
         }
     },
     "angularCompilerOptions": {

@@ -1,4 +1,5 @@
 import { Component, inject, signal } from "@angular/core";
+import { appear } from "@animations";
 import type { IEntity } from "@domain";
 import { NetworkService } from "@services";
 
@@ -8,6 +9,7 @@ import { NetworkService } from "@services";
     imports: [],
     templateUrl: "./example-page.component.html",
     styleUrl: "./example-page.component.scss",
+    animations: [appear("appear")],
 })
 export class ExamplePageComponent {
     private readonly network = inject(NetworkService);

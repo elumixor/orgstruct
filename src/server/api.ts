@@ -1,9 +1,9 @@
 import type { IEntity } from "@domain";
-import { request } from "./server";
+import { request } from "@elumixor/angular-server";
 
 export class Api {
     @request("echo")
-    echo({ data }: IEntity): IEntity {
+    getMessages({ data }: IEntity) {
         return { data };
     }
 }

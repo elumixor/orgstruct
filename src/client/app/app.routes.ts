@@ -1,5 +1,5 @@
 import type { Routes } from "@angular/router";
-import { ExamplePageComponent } from "@pages";
+import { ExamplePageComponent } from "./pages";
 
 export const routes: Routes = [
     {
