@@ -1,6 +1,7 @@
 import { Component, inject } from "@angular/core";
 import { Title } from "@angular/platform-browser";
 import { RouterOutlet } from "@angular/router";
+import { PrimeNGConfig } from "primeng/api";
 
 @Component({
     selector: "app-root",
@@ -11,8 +12,10 @@ import { RouterOutlet } from "@angular/router";
 })
 export class AppComponent {
     private readonly titleService = inject(Title);
+    private readonly primengConfig = inject(PrimeNGConfig);
 
     constructor() {
+        this.primengConfig.ripple = true;
         this.titleService.setTitle("Angular Boilerplate");
     }
 }

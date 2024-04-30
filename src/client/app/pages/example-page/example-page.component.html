@@ -1,1 +1,144 @@
 <p class="fg-secondary text-center text-huge bold italic underline" @appear>Entity data: {{ this.data() }}</p>
+
+<div class="flex flex-column gap-1">
+    <p-button label="Click me" [outlined]="true"></p-button>
+    <p-checkbox [(ngModel)]="checked" [binary]="true" label="Do stuff"></p-checkbox>
+    <p-chips [(ngModel)]="values" [separator]="separatorExp" placeholder="Hint: a, b c"></p-chips>
+    <p-colorPicker [(ngModel)]="color"></p-colorPicker>
+
+    <p-iconField>
+        <p-inputIcon styleClass="pi pi-search" />
+        <input type="text" pInputText />
+    </p-iconField>
+
+    <p-inputSwitch [(ngModel)]="checked"></p-inputSwitch>
+    <textarea [(ngModel)]="longText" pInputTextarea autoResize></textarea>
+
+    <p-multiSelect [options]="cities" [(ngModel)]="city" showClear display="chip"></p-multiSelect>
+
+    <p-selectButton [options]="paymentOptions" [(ngModel)]="paymentOption" [multiple]="true"
+                    optionValue="value"></p-selectButton>
+
+    <div>
+        {{paymentOption}}
+    </div>
+
+    <p-selectButton [options]="justifyOptions" [(ngModel)]="justify" optionLabel="icon">
+        <ng-template let-item pTemplate>
+            <i [class]="item.icon"></i>
+        </ng-template>
+    </p-selectButton>
+
+    <div>
+        {{justify | json }}
+    </div>
+
+    <p-treeSelect class="md:w-20rem w-full" containerStyleClass="w-full" [(ngModel)]="selectedNodes" [options]="nodes"
+                  placeholder="Select Item" selectionMode="checkbox" filter></p-treeSelect>
+    <!-- {{selectedNodes | json}} -->
+
+    <p-tag value="New"></p-tag>
+
+    <hr />
+
+    <div class="flex justify-content-center gap-1">
+        <div class="p-2 border-1 surface-border border-round w-15rem" pDroppable (onDrop)="drop(availableProducts)">
+            <ul class="list-none flex flex-column gap-2 p-0 m-0">
+                @for (product of availableProducts; track $index) {
+                <li class="p-2 border-round shadow-1" pDraggable
+                    (onDragStart)="dragStart(availableProducts, product)" (onDragEnd)="dragEnd()">
+                    {{product.name}}
+                </li>
+                }
+            </ul>
+        </div>
+
+        <div class="p-2 border-1 surface-border border-round w-15rem" pDroppable (onDrop)="drop(selectedProducts)">
+            <p class="text-center surface-border border-bottom-1">Drop Zone</p>
+            @if (selectedProducts) {
+            <ul class="list-none flex flex-column gap-2 p-0 m-0">
+                @for (product of selectedProducts; track $index) {
+                <li class="p-2 border-round shadow-1" pDraggable
+                    (onDragStart)="dragStart(selectedProducts, product)" (onDragEnd)="dragEnd()">
+                    {{product.name}}
+                </li>
+                }
+            </ul>
+            }
+        </div>
+    </div>
+
+
+
+
+
+
+
+
+
+
+
+    <p-table [value]="products" dataKey="name" [tableStyle]="{ 'min-width': '60rem' }">
+        <ng-template pTemplate="header">
+            <tr>
+                <th style="width: 5rem"></th>
+                <th pSortableColumn="name">Name <p-sortIcon field="name"></p-sortIcon></th>
+                <th pSortableColumn="price">Price <p-sortIcon field="price"></p-sortIcon></th>
+                <th pSortableColumn="category">Category <p-sortIcon field="category"></p-sortIcon></th>
+                <th pSortableColumn="inventoryStatus">Status <p-sortIcon field="inventoryStatus"></p-sortIcon></th>
+            </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-product let-expanded="expanded">
+            <tr>
+                <td>
+                    <button type="button" pButton pRipple [pRowToggler]="product"
+                            class="p-button-text p-button-rounded p-button-plain"
+                            [icon]="expanded ? 'pi pi-chevron-down' : 'pi pi-chevron-right'"></button>
+                </td>
+                <td>{{ product.name }}</td>
+                <td>{{ product.price | currency: 'USD' }}</td>
+                <td>{{ product.category }}</td>
+                <td>
+                    <p-tag [value]="product.inventoryStatus" [severity]="getSeverity(product.inventoryStatus)"></p-tag>
+                </td>
+            </tr>
+        </ng-template>
+        <ng-template pTemplate="rowexpansion" let-product>
+            <tr>
+                <td colspan="7">
+                    <div class="p-3">
+                        <p-table [value]="product.orders" dataKey="id">
+                            <ng-template pTemplate="header">
+            <tr>
+                <th pSortableColumn="id">Id <p-sortIcon field="price"></p-sortIcon></th>
+                <th pSortableColumn="customer">Customer <p-sortIcon field="customer"></p-sortIcon></th>
+                <th pSortableColumn="date">Date <p-sortIcon field="date"></p-sortIcon></th>
+                <th pSortableColumn="amount">Amount <p-sortIcon field="amount"></p-sortIcon></th>
+                <th pSortableColumn="status">Status <p-sortIcon field="status"></p-sortIcon></th>
+                <th style="width: 4rem"></th>
+            </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-order>
+            <tr>
+                <td>{{ order.id }}</td>
+                <td>{{ order.customer }}</td>
+                <td>{{ order.date }}</td>
+                <td>{{ order.amount | currency: 'USD' }}</td>
+                <td>
+                    <p-tag [value]="order.status" [severity]="getStatusSeverity(order.status)"></p-tag>
+                </td>
+                <td><p-button type="button" icon="pi pi-plus"></p-button></td>
+            </tr>
+        </ng-template>
+        <ng-template pTemplate="emptymessage">
+            <tr>
+                <td colspan="6">There are no order for this product yet.</td>
+            </tr>
+        </ng-template>
+    </p-table>
+</div>
+</td>
+</tr>
+</ng-template>
+</p-table>
+</div>
