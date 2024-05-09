@@ -1,0 +1,13 @@
+<!-- Select some property... -->
+
+<!-- Or special properties: -->
+
+<!-- Parents (immediate) contains... -->
+
+<!-- Parents (deep) contains... -->
+<div class="flex gap-1">
+    <app-select [items]="properties()" [(value)]="property" placeholder="Select property"></app-select>
+    <app-select [items]="comparisons" [(value)]="comparison" #comparisonSelect></app-select>
+    <app-select [items]="possibleItems()" [(value)]="filterItems" placeholder="Select items"
+                [multiple]="multiple()"></app-select>
+</div>

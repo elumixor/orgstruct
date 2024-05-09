@@ -1,0 +1,15 @@
+<button pButton size="small" icon="pi pi-filter" text outlined severity="secondary"
+        (click)="filterPopup.toggle($event)"></button>
+
+<app-popup #filterPopup>
+    <ng-template appPopupContent>
+        <div class="flex flex-column gap-1">
+            @for (filter of filters(); track $index) {
+            <app-filter [filter]="filter" (filterChange)="updateFilters($event, $index)"></app-filter>
+            }
+
+            <button pButton severity="secondary" size="small" label="New filter" icon="pi pi-plus"
+                    (click)="addFilter()"></button>
+        </div>
+    </ng-template>
+</app-popup>

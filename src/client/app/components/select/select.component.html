@@ -1,0 +1,58 @@
+@if (inline()) {
+<ng-container *ngTemplateOutlet="content"></ng-container>
+}
+@else {
+
+<!-- Use custom button template -->
+@if (buttonTemplate()) {
+<div (click)="menu.toggle($event)">
+    <ng-container *ngTemplateOutlet="buttonTemplate()!; context: { $implicit: selected().first }"></ng-container>
+</div>
+} @else {
+<!-- Use default style -->
+<div (click)="menu.toggle($event)"
+     class="w-full h-full flex align-items-center gap-1 px-1 border-round hover:surface-200">
+    @if (selected().isEmpty && placeholder()) {
+    <div class="p-1 surface-100 border-round font-italic text-sm text-500">
+        {{placeholder()}}
+    </div>
+    }
+    @for (item of selected(); track $index) {
+    @if (itemTemplate()) {
+    <ng-container *ngTemplateOutlet="itemTemplate()!; context: { $implicit: item }"></ng-container>
+    } @else {
+    <div class="p-1 surface-100 border-round">
+        <span [class]="item.icon"></span>
+        {{item.label}}
+    </div>
+    }
+    }
+</div>
+}
+
+<!-- Options as a toggle-able popup -->
+<app-popup #menu>
+    <ng-template appPopupContent>
+        <ng-container *ngTemplateOutlet="content"></ng-container>
+    </ng-template>
+</app-popup>
+}
+
+<!-- Options -->
+<ng-template #content>
+    <div class="flex flex-column gap-1">
+        @for (item of items(); track $index) {
+        @if (itemTemplate()) {
+        <div class="cursor-pointer" (click)="select(item)">
+            <ng-container *ngTemplateOutlet="itemTemplate()!; context: { $implicit: item }"></ng-container>
+        </div>
+        }
+        @else {
+        <button class="text-left" [class.surface-100]="isSelected(item)" type="button" pButton
+                [icon]="item.icon ?? ''"
+                (click)="select(item)" [label]="item.label ?? ''" severity="secondary" text
+                [disabled]="item.disabled"></button>
+        }
+        }
+    </div>
+</ng-template>

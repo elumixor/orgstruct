@@ -1,0 +1,56 @@
+table {
+    table-layout: fixed;
+}
+
+
+.dragger, .dynamic {
+    opacity: 0;
+    transition: opacity var(--medium) var(--easing);
+}
+
+.dragger {
+    cursor: grab;
+}
+
+tr {
+    height: 1px;
+
+    &:hover:not(.noselect) {
+        background-color: rgba(0, 0, 0, 0.05);
+
+        .dragger, .dynamic {
+            opacity: 0.5;
+
+            &:hover {
+                opacity: 1;
+            }
+        }
+    }
+}
+
+td {
+    height: inherit;
+}
+
+.display-contents {
+    display: contents;
+}
+
+@mixin hoverable($base: 0.5, $hover: 1) {
+    opacity: $base;
+
+    &:hover {
+        opacity: $hover;
+    }
+}
+
+::ng-deep {
+    .add-button > button {
+        background-color: transparent;
+        border: none;
+        width: 100%;
+        text-align: left;
+
+        @include hoverable();
+    }
+}

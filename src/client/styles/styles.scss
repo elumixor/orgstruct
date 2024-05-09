@@ -3,6 +3,38 @@
 @import "primeflex/primeflex.css";
 @import "primeicons/primeicons.css";
 
-// @import "./layout.scss";
-// @import "./fonts.scss";
-// @import "./colors.scss";
+:root {
+    --easing: cubic-bezier(.15,.9,.65,1.01);
+    --short: 0.1s;
+    --medium: 0.3s;
+    --long: 0.5s;
+}
+
+input {
+    border: none;
+    box-shadow: none;
+    cursor: text;
+    background-color: transparent;
+    flex-grow: 1;
+
+    &:hover {
+        background-color: rgba(0, 0, 0, 0.05);
+    }
+
+    &:focus {
+        outline: none;
+        background-color: rgba(0, 0, 0, 0.1);
+    }
+}
+
+@each $opacity in 0 10 20 30 40 50 60 70 80 90 100 {
+    .hover\:opacity-#{$opacity} {
+        &:hover {
+            opacity: calc($opacity / 100) !important;
+        }
+    }
+}
+
+.cursor-default {
+    cursor: default;
+}

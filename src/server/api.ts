@@ -1,9 +1,9 @@
-import type { IEntity } from "@domain";
+// import type { ITask } from "@domain";
 import { request } from "@elumixor/angular-server";
 
 export class Api {
-    @request("echo")
-    getMessages({ data }: IEntity) {
-        return { data };
+    @request("tasks")
+    getGetTasks() {
+        // return [] as ITask[];
     }
 }

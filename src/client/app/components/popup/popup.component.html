@@ -1,0 +1,6 @@
+@if (visible) {
+<div class="container border-1 border-200 p-2 border-round bg-white shadow-1 mt-1"
+     [style.left.px]="x" [style.top.px]="y" #container @appear>
+    <ng-container *ngTemplateOutlet="templateOutlet(); context: {$implicit: context}"></ng-container>
+</div>
+}

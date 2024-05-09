@@ -1,0 +1,17 @@
+<div class="content flex flex-column gap-2 mx-auto">
+
+    <app-board header="Week">
+        <app-board-list></app-board-list>
+        <app-board-list></app-board-list>
+    </app-board>
+
+    <p-panel header="Everything">
+        <app-task-table></app-task-table>
+
+        <ng-template pTemplate="icons">
+            <button pButton icon="pi pi-plus" size="small" (click)="addProperty()" severity="secondary" outlined
+                    label="Add Property">
+            </button>
+        </ng-template>
+    </p-panel>
+</div>

@@ -1,0 +1,5 @@
+.container {
+    position: fixed;
+    transition: opacity var(--medium) var(--easing);
+    z-index: 1000;
+}

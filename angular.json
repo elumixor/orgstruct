@@ -102,6 +102,7 @@
         }
     },
     "cli": {
+        "packageManager": "bun",
         "analytics": "cb35d2de-2c42-49b7-8239-f2999138487b",
         "schematicCollections": ["@angular-eslint/schematics"]
     }

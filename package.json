@@ -28,7 +28,7 @@
     "@angular/ssr": "^17.1.0",
     "@elumixor/angular-server": "^0.3.1",
     "@elumixor/eslint": "^0.1.1",
-    "@elumixor/frontils": "^1.4.0",
+    "@elumixor/frontils": "^1.6.1",
     "@types/cors": "^2.8.17",
     "cors": "^2.8.5",
     "drizzle-orm": "^0.30.9",
@@ -38,6 +38,7 @@
     "primeicons": "^7.0.0",
     "primeng": "^17.15.0",
     "rxjs": "~7.8.0",
+    "tinycolor2": "^1.6.0",
     "tslib": "^2.3.0",
     "winston": "^3.13.0",
     "zone.js": "~0.14.3"
@@ -49,6 +50,7 @@
     "@ngx-env/builder": "^17.3.0",
     "@types/express": "^4.17.17",
     "@types/node": "^18.18.0",
+    "@types/tinycolor2": "^1.4.6",
     "concurrently": "^8.2.2",
     "drizzle-kit": "^0.20.17",
     "typescript": "~5.3.2"

@@ -1,0 +1,13 @@
+<div class="w-15rem" pDroppable (onDrop)="drop($event)">
+    <div class="flex gap-1 align-items-baseline mb-2">
+        <input pInputText class="w-full surface-100 hover:surface-200" [(ngModel)]="title" type="text">
+
+        <app-property-filter (updated)="filteredTasks.set($event)"></app-property-filter>
+        <app-property-manager (updated)="visibleProperties.set($event)"></app-property-manager>
+    </div>
+
+    @for (task of filteredTasks(); track $index) {
+    <app-board-card pDraggable [task]="task" [properties]="visibleProperties()"></app-board-card>
+    }
+
+</div>
