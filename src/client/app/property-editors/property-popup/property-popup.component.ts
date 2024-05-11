@@ -36,7 +36,7 @@ export class PropertyPopupComponent {
     }
 
     get availableTags() {
-        return this.tagDescriptor.parameters!.values;
+        return this.tagDescriptor.parameters!.values.values().toArray();
     }
 
     // For type casting

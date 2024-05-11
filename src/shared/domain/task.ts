@@ -1,9 +1,9 @@
 export interface ITaskResponse {
-    id: string;
+    id: number;
     properties: Record<string, Task2Id<IPropertyValue>>;
 }
 
-type Task2Id<T> = T extends Task[] ? string[] : T extends ITag[] ? number[] : T;
+type Task2Id<T> = T extends Task[] ? number[] : T extends ITag[] ? number[] : T;
 
 export interface PropertyMap extends Map<IPropertyDescriptor, IPropertyValue> {
     get<T extends IPropertyType>(key: IPropertyDescriptor<T>): IPropertyValue<T>;
@@ -12,7 +12,7 @@ export interface PropertyMap extends Map<IPropertyDescriptor, IPropertyValue> {
 
 export class Task {
     constructor(
-        readonly id: string,
+        public id: number,
         readonly properties: PropertyMap,
         readonly nameProperty: IPropertyDescriptor<"text">,
         readonly childrenProperty: IPropertyDescriptor<"relation">,
@@ -44,16 +44,16 @@ export class Task {
 export interface IPropertyDescriptors {
     text: { value: string };
     relation: { value: Task[] };
-    moment: { value: Date | undefined };
-    interval: { value: { start: Date; end: Date } };
-    tag: { value: ITag[]; parameters: { multiple: boolean; values: ITag[] } }; // indices of the selected tags
+    // moment: { value: Date };
+    // interval: { value: { start: Date; end: Date } };
+    tag: { value: ITag[]; parameters: { multiple: boolean; values: Map<number, ITag> } }; // indices of the selected tags
 }
 
 export type IPropertyType = keyof IPropertyDescriptors;
 export type IPropertyValue<T extends IPropertyType = IPropertyType> = IPropertyDescriptors[T]["value"];
 
 export interface IPropertyDescriptor<T extends IPropertyType = IPropertyType> {
-    id: string;
+    id: number;
     name: string;
     icon?: string;
     type: T;
@@ -61,7 +61,8 @@ export interface IPropertyDescriptor<T extends IPropertyType = IPropertyType> {
 }
 
 export interface ITag {
-    name: string;
+    id: number;
+    label: string;
     color: string;
 }
 
@@ -102,7 +103,7 @@ export type Flat<T> = T extends (infer U)[] ? U : T;
 export type IComparison = "is" | "is not" | "in" | "not in";
 
 export interface IBoardData {
-    namePropertyId: string;
-    childrenPropertyId: string;
-    parentsPropertyId: string;
+    nameDescriptorId: number;
+    childrenDescriptorId: number;
+    parentsDescriptorId: number;
 }

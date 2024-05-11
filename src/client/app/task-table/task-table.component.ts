@@ -42,17 +42,6 @@ export class TaskTableComponent {
         return descriptors.filter((p) => p !== childrenProperty && p !== parentsProperty);
     });
 
-    private readonly openMap = new Map<string, boolean>();
-
-    isOpen(row: { data: Task }) {
-        return this.openMap.get(row.data.id);
-    }
-
-    toggle(row: { data: Task }) {
-        const { id } = row.data;
-        this.openMap.set(id, !this.openMap.get(id));
-    }
-
     addTask(parent?: Task) {
         this.tasksService.addTask(parent);
     }

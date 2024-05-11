@@ -46,14 +46,12 @@
         <app-popup #tagEdit>
             <ng-template appPopupContent>
                 <div class="flex gap-1 align-items-center">
-                    <input pInputText type="text" [(ngModel)]="tag.name">
+                    <input pInputText type="text" [(ngModel)]="tag.label">
                     <p-colorPicker [(ngModel)]="tag.color" />
                 </div>
             </ng-template>
         </app-popup>
     </button>
-
-
     }
 </div>
 }

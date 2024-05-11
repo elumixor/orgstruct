@@ -110,10 +110,13 @@ export class FilterComponent {
 
     private readonly tagItems = computed(
         () =>
-            ((this.filter().property as IPropertyDescriptor<"tag">).parameters?.values.map((value) => ({
-                label: value.name,
-                value,
-            })) ?? []) satisfies ISelectItem<ITag>[],
+            ((this.filter().property as IPropertyDescriptor<"tag">).parameters?.values
+                .values()
+                .map((value) => ({
+                    label: value.label,
+                    value,
+                }))
+                .toArray() ?? []) satisfies ISelectItem<ITag>[],
     );
 
     private readonly relationItems = computed(

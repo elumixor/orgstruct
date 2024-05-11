@@ -11,7 +11,7 @@ import tinycolor from "tinycolor2";
 })
 export class TagComponent {
     readonly tag = input.required<ITag>();
-    readonly label = computed(() => this.tag().name);
+    readonly label = computed(() => this.tag().label);
     readonly style = computed(() => {
         const tag = this.tag();
         return {

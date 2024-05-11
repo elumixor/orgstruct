@@ -1,6 +1,6 @@
 import { Component, computed, inject, input, model } from "@angular/core";
 import { TasksService } from "@services/tasks.service";
-import type { IPropertyDescriptor, ITag, Task } from "@shared";
+import { Task, type IPropertyDescriptor, type ITag, type PropertyMap } from "@shared";
 import { ComponentsModule } from "../../components";
 import type { ISelectItem } from "../../components/select/select.component";
 
@@ -23,7 +23,18 @@ export class PropertyEditorComponent<T extends IPropertyDescriptor> {
         return this.task().properties.get(this.property());
     }
     set value(value) {
-        this.task().properties.set(this.property(), value);
+        this.task.update((t) => {
+            const properties = t.properties;
+            t.properties.set(this.property(), value);
+
+            return new Task(
+                t.id,
+                new Map(properties) as PropertyMap,
+                t.nameProperty,
+                t.childrenProperty,
+                t.parentsProperty,
+            );
+        });
     }
 
     get tags() {
@@ -42,7 +53,10 @@ export class PropertyEditorComponent<T extends IPropertyDescriptor> {
 
     get availableTags() {
         const descriptor = this.property() as IPropertyDescriptor<"tag">;
-        return descriptor.parameters!.values.map((value) => ({ label: value.name.capitalize(), value }));
+        return descriptor
+            .parameters!.values.values()
+            .map((value) => ({ label: value.label.capitalize(), value }))
+            .toArray();
     }
 
     get multipleTags() {
