@@ -5,59 +5,17 @@
     </ng-template>
 </app-popup>
 
-<table class="w-full" cellspacing="0" cellpadding="0">
-    <thead>
-        <tr class="noselect">
-            @for (descriptor of descriptors(); track $index) {
-            <th class="text-left px-1 py-2 hover:surface-100 cursor-pointer" (click)="menu.toggle($event, descriptor)">
-                {{ descriptor.name }}
-            </th>
-            }
-        </tr>
-    </thead>
-    <tbody>
-        <ng-container *ngTemplateOutlet="rowsRef; context: { rows: tasks, level: 0 }"></ng-container>
-    </tbody>
-</table>
 
-<!-- Recursive template to project multiple rows with an indent level and a button to create extra row -->
-<ng-template #rowsRef let-tasks="rows" let-level="level" let-parent="parent">
-    @for (task of tasks; track task) {
-    <tr>
-        @for (descriptor of descriptors(); track $index) {
-        <td class="p-0">
-            <span class="w-full h-full flex">
-                @if ($index === 0) {
-                <ng-container *ngTemplateOutlet="padding; context: { $implicit: level, dragger: true }"></ng-container>
-                <p-button [class.dynamic]="task.children.length === 0 && !task.open"
-                          icon="pi pi-angle-{{task.open ? 'down' : 'right'}}"
-                          [text]="true"
-                          (onClick)="task.open = !task.open"
-                          severity="secondary"></p-button>
-                }
-                <app-property-editor class="w-full" [property]="descriptor" [task]="task.data"></app-property-editor>
-            </span>
-        </td>
-        }
-    </tr>
-    @if (task.open) {
-    <ng-container *ngTemplateOutlet="rowsRef; context: { rows: task.children, level: level + 1, parent: task.data }">
-    </ng-container>
+<div class="flex">
+    @for (property of properties(); track $index) {
+    <div class="text-left px-1 py-2 hover:surface-100 cursor-pointer" (click)="menu.toggle($event, property)">
+        {{property.name}}
+    </div>
     }
-    }
-    <tr>
-        <td class="p-0" [attr.colspan]="descriptors.length">
-            <p-button class="add-button" icon="pi pi-plus" label="New Task" severity="secondary"
-                      (onClick)="addTask(parent)">
-                <ng-container *ngTemplateOutlet="padding; context: { $implicit: level }"></ng-container>
-            </p-button>
-        </td>
-    </tr>
-</ng-template>
+</div>
 
-<ng-template #padding let-level let-dragger="dragger">
-    <span class="inline-block" [style.width.rem]="2 * level"></span>
-    @if (dragger) {
-    <span class="pi pi-bars align-self-center px-2 dragger"></span>
-    }
-</ng-template>
+@for (task of tasks(); track task) {
+<app-task-row [task]="task"></app-task-row>
+}
+
+<app-task-add-button (clicked)="addTask()" [first]="true"></app-task-add-button>

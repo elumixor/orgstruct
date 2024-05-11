@@ -1,0 +1,14 @@
+<hr class="m-0 border-bottom-none opacity-20">
+<div class="flex opacity-50 hover:opacity-100 cursor-pointer hover:surface-100 border-round row"
+     (click)="clicked.emit()">
+    @if (!first()) {
+    <div class="pi pi-bars align-self-center px-2 opacity-0"></div>
+    <div class="inline-block" [style.width.rem]="2 * level()"></div>
+    <p-button class="opacity-0" disabled icon="pi pi-angle-down" [text]="true" severity="secondary"></p-button>
+    }
+
+    <div class="flex gap-2 align-items-center p-2">
+        <span class="pi pi-plus"></span>
+        <span>New Task</span>
+    </div>
+</div>

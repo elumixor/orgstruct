@@ -1,44 +1,27 @@
-import { NgTemplateOutlet } from "@angular/common";
 import { Component, computed, inject } from "@angular/core";
-import { FormsModule } from "@angular/forms";
 import { TasksService } from "@services/tasks.service";
-// import type { ITask } from "@shared";
 import type { Task } from "@shared";
-import { ButtonModule } from "primeng/button";
-import { InputTextModule } from "primeng/inputtext";
-import { PopupContentDirective } from "../components/popup/popup-content.directive";
-import { PopupComponent } from "../components/popup/popup.component";
-import { PropertyEditorComponent } from "../property-editors/property-editor/property-editor.component";
+import { ComponentsModule } from "../components";
+import { TaskRowComponent } from "./task-row/task-row.component";
 import { PropertyPopupComponent } from "../property-editors/property-popup/property-popup.component";
+import { TaskAddButtonComponent } from "./task-add-button/task-add-button.component";
 
 @Component({
     selector: "app-task-table",
     standalone: true,
-    imports: [
-        FormsModule,
-        ButtonModule,
-        NgTemplateOutlet,
-        InputTextModule,
-        PropertyEditorComponent,
-        PopupComponent,
-        PropertyPopupComponent,
-        PopupContentDirective,
-    ],
+    imports: [ComponentsModule, TaskRowComponent, PropertyPopupComponent, TaskAddButtonComponent],
     templateUrl: "./task-table.component.html",
     styleUrl: "./task-table.component.scss",
 })
 export class TaskTableComponent {
     private readonly tasksService = inject(TasksService);
 
-    get tasks() {
-        return this.tasksService.taskTree();
-    }
+    readonly tasks = this.tasksService.taskTree;
 
-    readonly descriptors = computed(() => {
+    readonly properties = computed(() => {
         const descriptors = this.tasksService.properties().values().toArray();
         const childrenProperty = this.tasksService.childrenProperty();
         const parentsProperty = this.tasksService.parentsProperty();
-
         return descriptors.filter((p) => p !== childrenProperty && p !== parentsProperty);
     });
 

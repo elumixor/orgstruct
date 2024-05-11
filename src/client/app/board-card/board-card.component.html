@@ -1,4 +1,5 @@
-<div class="p-2 my-1 border-1 border-round border-200 shadow-1 hover:shadow-3 transition-all transition-duration-300">
+<div
+     class="p-2 my-1 flex flex-column gap-1 border-1 border-round border-200 shadow-1 hover:shadow-3 transition-all transition-duration-300">
     @for (property of properties(); track $index) {
     <app-property-editor [task]="task()" [property]="property"></app-property-editor>
     }

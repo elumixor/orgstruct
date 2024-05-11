@@ -18,12 +18,12 @@ input {
     flex-grow: 1;
 
     &:hover {
-        background-color: rgba(0, 0, 0, 0.05);
+        background-color: var(--surface-100);
     }
 
     &:focus {
         outline: none;
-        background-color: rgba(0, 0, 0, 0.1);
+        background-color: var(--surface-200);
     }
 }
 

@@ -1,0 +1,14 @@
+.dynamic {
+    opacity: 0;
+    cursor: pointer;
+    transition: opacity var(--short) var(--easing);
+}
+
+.row:hover .dynamic {
+    opacity: 0.5;
+    &:hover { opacity: 1; }
+}
+
+::ng-deep app-property-editor.border-noround input {
+    border-radius: 0;
+}
