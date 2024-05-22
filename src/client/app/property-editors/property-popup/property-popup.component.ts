@@ -1,8 +1,9 @@
 import { Component, computed, inject, input, output } from "@angular/core";
 import { TasksService } from "@services/tasks.service";
-import type { IPropertyDescriptor, IPropertyType } from "@shared";
+import type { ITag, Property, PropertyType } from "@shared";
 import { ComponentsModule } from "../../components";
 import type { ISelectItem } from "../../components/select/select.component";
+import { nonNull } from "@elumixor/frontils";
 
 @Component({
     selector: "app-property-popup",
@@ -13,39 +14,43 @@ import type { ISelectItem } from "../../components/select/select.component";
 })
 export class PropertyPopupComponent {
     readonly deleted = output<boolean>();
-    readonly descriptor = input.required<IPropertyDescriptor>();
+    readonly property = input.required<Property>();
     readonly tasksService = inject(TasksService);
 
-    readonly isTitle = computed(() => this.tasksService.nameProperty() === this.descriptor());
+    readonly isTitle = computed(() => this.tasksService.nameProperty() === this.property());
 
-    readonly types = this.tasksService.propertyIcons
-        .entries()
-        .map(([type, icon]) => ({
-            label: type.capitalize(),
-            value: type,
-            icon,
-        }))
-        .toArray() satisfies ISelectItem<IPropertyType>[];
+    readonly types = Object.entries(this.tasksService.propertyIcons).map(([type, icon]) => ({
+        label: type.capitalize(),
+        value: type as PropertyType,
+        icon,
+    })) satisfies ISelectItem<PropertyType>[];
 
     get type() {
-        return [this.descriptor().type];
+        return [this.property().type()];
     }
-    set type(value: IPropertyType[]) {
+    set type(value: PropertyType[]) {
         // We need more complex logic here, coercing the types, etc.
-        this.descriptor().type = value.first;
+        this.property().type.set(value.first);
     }
 
     get availableTags() {
-        return this.tagDescriptor.parameters!.values.values().toArray();
+        return Object.values(nonNull(this.tagProperty.parameters()).values);
     }
 
     // For type casting
-    get tagDescriptor() {
-        return this.descriptor() as IPropertyDescriptor<"tag">;
+    get tagProperty() {
+        return this.property() as Property<"tag">;
+    }
+
+    deleteTag(tag: ITag) {
+        this.tagProperty.parameters.update((p) => ({
+            multiple: p!.multiple,
+            values: Object.fromEntries(Object.entries(p!.values).filter(([, value]) => value !== tag)),
+        }));
     }
 
     deleteProperty() {
-        this.tasksService.deleteProperty(this.descriptor());
+        this.tasksService.deleteProperty(this.property());
         this.deleted.emit(true);
     }
 }

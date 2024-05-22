@@ -15,8 +15,7 @@ import { TaskAddButtonComponent } from "./task-add-button/task-add-button.compon
 })
 export class TaskTableComponent {
     private readonly tasksService = inject(TasksService);
-
-    readonly tasks = this.tasksService.taskTree;
+    readonly tasks = computed(() => this.tasksService.tasks().filter((task) => task.topLevel()));
 
     readonly properties = computed(() => {
         const descriptors = this.tasksService.properties().values().toArray();

@@ -1,5 +1,15 @@
 import { NgTemplateOutlet } from "@angular/common";
-import { Component, ElementRef, NgZone, TemplateRef, computed, contentChild, inject, viewChild } from "@angular/core";
+import {
+    Component,
+    ElementRef,
+    NgZone,
+    TemplateRef,
+    computed,
+    contentChild,
+    inject,
+    input,
+    viewChild,
+} from "@angular/core";
 import { PopupContentDirective } from "./popup-content.directive";
 import { appear } from "@animations";
 
@@ -16,6 +26,7 @@ export class PopupComponent {
     x = 0;
     y = 0;
     context?: unknown;
+    readonly contextMenu = input<HTMLElement>();
     private readonly content = contentChild(PopupContentDirective, { read: TemplateRef<HTMLElement> });
     private readonly container = viewChild<ElementRef<HTMLElement>>("container");
     private readonly zone = inject(NgZone);

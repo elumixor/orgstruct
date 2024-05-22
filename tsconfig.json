@@ -1,4 +1,3 @@
-/* To learn more about this file see: https://angular.io/config/tsconfig. */
 {
     "compileOnSave": false,
     "compilerOptions": {
@@ -22,16 +21,16 @@
         "verbatimModuleSyntax": true,
         "lib": ["ES2022", "dom"],
         "paths": {
-            "@styles/*": ["./src/client/styles/*"],
-            "@shared": ["./src/shared"],
-            "@shared/*": ["./src/shared/*"],
-            "@utils": ["./src/shared/utils"],
-            "@utils/*": ["./src/shared/utils/*"],
+            "@animations": ["./src/client/app/animations"],
             "@domain": ["./src/shared/domain"],
             "@domain/*": ["./src/shared/domain/*"],
             "@services": ["./src/client/app/services"],
             "@services/*": ["./src/client/app/services/*"],
-            "@animations": ["./src/client/app/animations"]
+            "@shared": ["./src/shared"],
+            "@shared/*": ["./src/shared/*"],
+            "@styles/*": ["./src/client/styles/*"],
+            "@utils": ["./src/shared/utils"],
+            "@utils/*": ["./src/shared/utils/*"]
         }
     },
     "angularCompilerOptions": {

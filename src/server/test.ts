@@ -1,4 +1,4 @@
-import { boards, database, descriptors, tags, tasks, values } from "./db";
+import { boards, database, properties, tags, tasks, values } from "./db";
 
 const { db, connection } = database();
 
@@ -9,7 +9,7 @@ function cleanStuff() {
         await tx.delete(tags);
         await tx.delete(tasks);
         await tx.delete(boards);
-        await tx.delete(descriptors);
+        await tx.delete(properties);
     });
 }
 function insertStuff() {
@@ -21,7 +21,7 @@ function insertStuff() {
             { descriptorId: parentsId },
             { descriptorId: tagId },
         ] = await tx
-            .insert(descriptors)
+            .insert(properties)
             .values([
                 {
                     type: "text",
@@ -43,7 +43,7 @@ function insertStuff() {
                     multiple: false,
                 },
             ])
-            .returning({ descriptorId: descriptors.id });
+            .returning({ descriptorId: properties.id });
 
         console.log(`Created a descriptors with ids [${nameId}, ${childrenId}, ${parentsId}]`);
 
@@ -51,9 +51,9 @@ function insertStuff() {
         const [{ boardId }] = await tx
             .insert(boards)
             .values({
-                nameDescriptorId: nameId,
-                childrenDescriptorId: childrenId,
-                parentsDescriptorId: parentsId,
+                namePropertyId: nameId,
+                childrenPropertyId: childrenId,
+                parentsPropertyId: parentsId,
             })
             .returning({ boardId: boards.id });
 
@@ -64,17 +64,17 @@ function insertStuff() {
             .insert(tags)
             .values([
                 {
-                    descriptorId: tagId,
+                    propertyId: tagId,
                     label: "High",
                     color: "#FF0000",
                 },
                 {
-                    descriptorId: tagId,
+                    propertyId: tagId,
                     label: "Medium",
                     color: "#00FF00",
                 },
                 {
-                    descriptorId: tagId,
+                    propertyId: tagId,
                     label: "Low",
                     color: "#0000FF",
                 },
@@ -92,34 +92,34 @@ function insertStuff() {
         await tx.insert(values).values([
             // Add name to both tasks
             {
-                descriptorId: nameId,
+                propertyId: nameId,
                 taskId: firstId,
                 text: "First task",
             },
             {
-                descriptorId: nameId,
+                propertyId: nameId,
                 taskId: secondId,
                 text: "Second task",
             },
             // Make second task a child of the first
             {
-                descriptorId: childrenId,
+                propertyId: childrenId,
                 taskId: firstId,
                 relation: secondId,
             },
             {
-                descriptorId: parentsId,
+                propertyId: parentsId,
                 taskId: secondId,
                 relation: firstId,
             },
             // Add priorities
             {
-                descriptorId: tagId,
+                propertyId: tagId,
                 taskId: firstId,
                 tag: highId,
             },
             {
-                descriptorId: tagId,
+                propertyId: tagId,
                 taskId: secondId,
                 tag: lowId,
             },

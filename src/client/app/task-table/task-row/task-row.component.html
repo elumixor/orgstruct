@@ -1,38 +1,61 @@
 <!-- Row -->
-<hr class="m-0 border-bottom-none opacity-20">
-<div class="flex row">
+<hr class="m-0 border-bottom-none opacity-20" />
+<div class="flex row" #row>
     <!-- For each property -->
     @for (property of properties(); track $index) {
-    <!-- Fir the first property, we also need to add a dragger, and button to expand and show children -->
-    @if ($first) {
-    <div class="w-full flex">
-        <div class="pi pi-bars align-self-center px-2 dynamic"></div>
-        <div class="inline-block" [style.width.rem]="2 * level()"></div>
-        <p-button class="border-noround" [class.dynamic]="task().children.isEmpty && !open"
-                  icon="pi pi-angle-{{open ? 'down' : 'right'}}"
-                  [text]="true"
-                  (onClick)="toggle()"
-                  severity="secondary"></p-button>
-        <app-property-editor class="w-full border-noround" [property]="property"
-                             [(task)]="task().data"></app-property-editor>
-    </div>
-    } @else {
-    <!-- Otherwise we just show the property editor -->
-    <app-property-editor class="w-full" [property]="property" [(task)]="task().data"></app-property-editor>
-    }
+        <!-- Template for the property editor -->
+        <ng-template #prop>
+            <app-property-editor class="w-full" [property]="property" [task]="task()"></app-property-editor>
+        </ng-template>
 
-    @if (!$last) {
-    <div class="border-left-1 opacity-20"></div>
-    }
+        <!-- Fir the first property, we also need to add a dragger, and button to expand and show children -->
+        @if ($first) {
+            <div class="w-full flex">
+                <div class="pi pi-bars align-self-center px-2 dynamic" (click)="popup.toggle($event)"></div>
+                <div class="inline-block" [style.width.rem]="2 * level()"></div>
+                <!-- Button to show/hide -->
+                <p-button
+                    class="border-noround"
+                    [class.dynamic]="arrowDynamic()"
+                    [icon]="arrowIcon()"
+                    [text]="true"
+                    (onClick)="toggle()"
+                    severity="secondary"
+                ></p-button>
+                <ng-container *ngTemplateOutlet="prop"></ng-container>
+            </div>
+        } @else {
+            <ng-container *ngTemplateOutlet="prop"></ng-container>
+        }
+
+        <!-- Vertical divider between the properties -->
+        @if (!$last) {
+            <div class="border-left-1 opacity-20"></div>
+        }
     }
 </div>
 
 <!-- Next, we show subtasks, recursively -->
-@if (open) {
-@for (child of task().children; track $index) {
-<app-task-row [task]="child" [level]="level() + 1" [parent]="task()"></app-task-row>
+@if (open()) {
+    @for (child of task().children(); track $index) {
+        <app-task-row [task]="child" [level]="level() + 1" [parent]="task()"></app-task-row>
+    }
+
+    <!-- Next, we show the button to add another task -->
+    <app-task-add-button (clicked)="addTask()" [level]="level()"></app-task-add-button>
 }
 
-<!-- Next, we show the button to add another task -->
-<app-task-add-button (clicked)="addTask()" [level]="level()"></app-task-add-button>
-}
+<!-- Context menu popup -->
+<app-popup [contextMenu]="row" #popup>
+    <ng-template appPopupContent>
+        <button
+            pButton
+            label="Delete"
+            icon="pi pi-trash"
+            size="small"
+            text
+            severity="danger"
+            (click)="deleteTask()"
+        ></button>
+    </ng-template>
+</app-popup>

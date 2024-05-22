@@ -1,65 +1,77 @@
 <!-- Actual window: -->
 <p-inputGroup>
     <!-- Change name using this input -->
-    <input pInputText [(ngModel)]="descriptor().name" [style.maxWidth.rem]="10" />
+    <input pInputText [(ngModel)]="property().name" [style.maxWidth.rem]="10" />
 
     <!-- Change type using this popup (see below) -->
     @if (!isTitle()) {
-    <app-select [(value)]="type" [items]="types">
-        <ng-template appSelectButton let-item>
-            <button class="select-button"
-                    style="border-top-left-radius: 0; border-bottom-left-radius: 0;"
+        <app-select [(value)]="type" [items]="types">
+            <ng-template appSelectButton let-item>
+                <button
+                    class="select-button"
+                    style="border-top-left-radius: 0; border-bottom-left-radius: 0"
                     type="button"
-                    pButton [icon]="item.icon"
+                    pButton
+                    [icon]="item.icon"
                     [label]="item.label"
-                    severity="secondary"></button>
-        </ng-template>
-    </app-select>
+                    severity="secondary"
+                ></button>
+            </ng-template>
+        </app-select>
     }
 
-    @if (descriptor().type === "tag") {
-    <p-toggleButton
-                    [(ngModel)]="tagDescriptor.parameters!.multiple"
-                    onLabel="Multiple"
-                    offLabel="Single" />
+    @if (property().type() === "tag") {
+        <p-toggleButton [(ngModel)]="tagProperty.parameters()!.multiple" onLabel="Multiple" offLabel="Single" />
     }
 </p-inputGroup>
 
 <!-- For tags, list the values and allow changing the color -->
-@if (descriptor().type === "tag") {
+@if (property().type() === "tag") {
+    <p-divider />
 
-<p-divider />
-
-<div class="flex flex-column mb-1 mt-2">
-    @for (tag of availableTags; track $index) {
-    <button pButton class="p-1" size="small" severity="secondary" text (click)="tagEdit.toggle($event)">
-        <div class="relative flex align-items-center justify-content-between w-full">
-            <app-tag [tag]="tag"></app-tag>
-            <div class="flex gap-1 align-items-center">
-                <button pButton size="small" severity="danger" icon="pi pi-trash" text
-                        (click)="tasksService.removeTag(tagDescriptor, tag)">
-                </button>
-            </div>
-        </div>
-
-        <!-- Popup to change the tag -->
-        <app-popup #tagEdit>
-            <ng-template appPopupContent>
-                <div class="flex gap-1 align-items-center">
-                    <input pInputText type="text" [(ngModel)]="tag.label">
-                    <p-colorPicker [(ngModel)]="tag.color" />
+    <div class="flex flex-column mb-1 mt-2">
+        @for (tag of availableTags; track $index) {
+            <button pButton class="p-1" size="small" severity="secondary" text (click)="tagEdit.toggle($event)">
+                <div class="relative flex align-items-center justify-content-between w-full">
+                    <app-tag [tag]="tag"></app-tag>
+                    <div class="flex gap-1 align-items-center">
+                        <button
+                            pButton
+                            size="small"
+                            severity="danger"
+                            icon="pi pi-trash"
+                            text
+                            (click)="deleteTag(tag)"
+                        ></button>
+                    </div>
                 </div>
-            </ng-template>
-        </app-popup>
-    </button>
-    }
-</div>
+
+                <!-- Popup to change the tag -->
+                <app-popup #tagEdit>
+                    <ng-template appPopupContent>
+                        <div class="flex gap-1 align-items-center">
+                            <input pInputText type="text" [(ngModel)]="tag.label" />
+                            <p-colorPicker [(ngModel)]="tag.color" />
+                        </div>
+                    </ng-template>
+                </app-popup>
+            </button>
+        }
+    </div>
 }
 
 <!-- Delete property button (in case it's deletable) -->
 @if (!isTitle()) {
-<p-divider />
+    <p-divider />
 
-<button type="button" pButton icon="pi pi-trash" label="Delete property"
-        (click)="deleteProperty()" class="w-full text-left" severity="danger" text></button>
+    <button
+        type="button"
+        pButton
+        icon="pi pi-trash"
+        label="Delete property"
+        (click)="deleteProperty()"
+        class="w-full text-left"
+        severity="danger"
+        text
+    ></button>
 }

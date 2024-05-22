@@ -1,35 +1,33 @@
 @switch (type()) {
+    <!-- Text -->
+    @case ("text") {
+        <input class="px-1 py-2 w-full h-full" type="text" pInputText [(ngModel)]="value" />
+    }
 
-<!-- Text -->
-@case ("text") {
-<input class="px-1 py-2 w-full h-full" type="text" pInputText [(ngModel)]="value" />
-}
+    <!-- Tag -->
+    @case ("tag") {
+        <app-select [items]="availableTags" [(value)]="tags" [multiple]="multipleTags">
+            <ng-template appSelectItem let-item>
+                <app-tag [tag]="item.value"></app-tag>
+            </ng-template>
+        </app-select>
+    }
 
-<!-- Tag -->
-@case ("tag") {
-<app-select [items]="availableTags" [(value)]="tags" [multiple]="multipleTags">
-    <ng-template appSelectItem let-item>
-        <app-tag [tag]="item.value"></app-tag>
-    </ng-template>
-</app-select>
-}
-
-<!-- Moment -->
-<!-- @case ("moment") {
+    <!-- Moment -->
+    <!-- @case ("moment") {
 <p-calendar [(ngModel)]="value" />
 } -->
 
-<!-- Interval -->
-<!-- @case ("interval") {
+    <!-- Interval -->
+    <!-- @case ("interval") {
 <p-calendar
             [(ngModel)]="value"
             selectionMode="range"
             [readonlyInput]="true" />
 } -->
 
-<!-- Relation -->
-@case ("relation") {
-<app-select [items]="availableRelations" [(value)]="relations" [multiple]="true" />
-}
-
+    <!-- Relation -->
+    @case ("relation") {
+        <app-select [items]="availableRelations" [(value)]="relations" [multiple]="true" />
+    }
 }

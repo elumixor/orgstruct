@@ -13,6 +13,7 @@ import { TagModule } from "primeng/tag";
 import { ToggleButtonModule } from "primeng/togglebutton";
 import { CalendarModule } from "primeng/calendar";
 import { MultiSelectModule } from "primeng/multiselect";
+import { ContextMenuModule } from "primeng/contextmenu";
 
 @NgModule({
     declarations: [],
@@ -31,6 +32,7 @@ import { MultiSelectModule } from "primeng/multiselect";
         ToggleButtonModule,
         CalendarModule,
         MultiSelectModule,
+        ContextMenuModule,
     ],
     exports: [
         CardModule,
@@ -45,6 +47,7 @@ import { MultiSelectModule } from "primeng/multiselect";
         ToggleButtonModule,
         CalendarModule,
         MultiSelectModule,
+        ContextMenuModule,
     ],
 })
 // eslint-disable-next-line @typescript-eslint/no-extraneous-class

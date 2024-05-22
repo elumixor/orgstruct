@@ -1,5 +1,5 @@
 import { Component, input } from "@angular/core";
-import type { IPropertyDescriptor, Task } from "@shared";
+import type { Property, Task } from "@shared";
 import { ComponentsModule } from "../components/components.module";
 import { PropertyEditorComponent } from "../property-editors/property-editor/property-editor.component";
 
@@ -12,5 +12,5 @@ import { PropertyEditorComponent } from "../property-editors/property-editor/pro
 })
 export class BoardCardComponent {
     readonly task = input.required<Task>();
-    readonly properties = input.required<IPropertyDescriptor[]>();
+    readonly properties = input.required<Property[]>();
 }

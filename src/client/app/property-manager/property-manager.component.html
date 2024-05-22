@@ -1,19 +1,27 @@
-<button pButton size="small" icon="pi pi-list" text
-        outlined severity="secondary"
-        (click)="propertiesPopup.toggle($event)"></button>
+<button
+    pButton
+    size="small"
+    icon="pi pi-list"
+    text
+    outlined
+    severity="secondary"
+    (click)="propertiesPopup.toggle($event)"
+></button>
 
 <app-popup #propertiesPopup>
     <ng-template appPopupContent>
         <div class="flex flex-column gap-1">
             @for (property of properties(); track $index) {
-            <div class="p-1 px-2 hover:surface-100 flex gap-3 border-round align-items-center cursor-default">
-                <div [class]="property.icon + ' opacity-50'"></div>
-                <div class="flex-grow-1">{{property.name}}</div>
-                <div class="pi opacity-20 hover:opacity-50 cursor-pointer"
-                     [class.pi-eye]="!hidden.has(property)" [class.pi-eye-slash]="hidden.has(property)"
-                     (click)="hidden.toggle(property)">
+                <div class="p-1 px-2 hover:surface-100 flex gap-3 border-round align-items-center cursor-default">
+                    <div [class]="property.icon + ' opacity-50'"></div>
+                    <div class="flex-grow-1">{{ property.name() }}</div>
+                    <div
+                        class="pi opacity-20 hover:opacity-50 cursor-pointer"
+                        [class.pi-eye]="!hidden.has(property)"
+                        [class.pi-eye-slash]="hidden.has(property)"
+                        (click)="hidden.toggle(property)"
+                    ></div>
                 </div>
-            </div>
             }
         </div>
     </ng-template>

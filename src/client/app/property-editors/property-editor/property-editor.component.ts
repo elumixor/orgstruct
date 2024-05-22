@@ -1,6 +1,7 @@
-import { Component, computed, inject, input, model } from "@angular/core";
+import { Component, computed, inject, input } from "@angular/core";
+import { nonNull } from "@elumixor/frontils";
 import { TasksService } from "@services/tasks.service";
-import { Task, type IPropertyDescriptor, type ITag, type PropertyMap } from "@shared";
+import { Property, Task, type ITag } from "@shared";
 import { ComponentsModule } from "../../components";
 import type { ISelectItem } from "../../components/select/select.component";
 
@@ -11,30 +12,23 @@ import type { ISelectItem } from "../../components/select/select.component";
     templateUrl: "./property-editor.component.html",
     styleUrl: "./property-editor.component.scss",
 })
-export class PropertyEditorComponent<T extends IPropertyDescriptor> {
+export class PropertyEditorComponent<T extends Property> {
+    readonly task = input.required<Task>();
     readonly property = input.required<T>();
-    readonly task = model.required<Task>();
 
     private readonly tasksService = inject(TasksService);
 
-    readonly type = computed(() => this.property().type);
+    readonly type = computed(() => this.property().type());
+
+    private readonly _value = computed(() => this.task().properties.get(this.property()));
 
     get value() {
-        return this.task().properties.get(this.property());
+        return this._value()();
     }
     set value(value) {
-        this.task.update((t) => {
-            const properties = t.properties;
-            t.properties.set(this.property(), value);
+        this._value().set(value);
 
-            return new Task(
-                t.id,
-                new Map(properties) as PropertyMap,
-                t.nameProperty,
-                t.childrenProperty,
-                t.parentsProperty,
-            );
-        });
+        this.tasksService.updateTask(this.task(), this.property());
     }
 
     get tags() {
@@ -52,19 +46,19 @@ export class PropertyEditorComponent<T extends IPropertyDescriptor> {
     }
 
     get availableTags() {
-        const descriptor = this.property() as IPropertyDescriptor<"tag">;
-        return descriptor
-            .parameters!.values.values()
-            .map((value) => ({ label: value.label.capitalize(), value }))
-            .toArray();
+        const descriptor = this.property() as Property<"tag">;
+        return Object.values(nonNull(descriptor.parameters()).values).map((value) => ({
+            label: value.label.capitalize(),
+            value,
+        })) satisfies ISelectItem<ITag>[];
     }
 
     get multipleTags() {
-        const descriptor = this.property() as IPropertyDescriptor<"tag">;
-        return descriptor.parameters!.multiple;
+        const descriptor = this.property() as Property<"tag">;
+        return nonNull(descriptor.parameters()).multiple;
     }
 
     get availableRelations() {
-        return this.tasksService.tasks().map((t) => ({ label: t.name, value: t })) as unknown as ISelectItem<Task>[];
+        return this.tasksService.tasks().map((t) => ({ label: t.name(), value: t })) satisfies ISelectItem<Task>[];
     }
 }

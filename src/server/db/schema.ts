@@ -4,7 +4,7 @@ import { boolean, integer, pgEnum, pgTable, serial, varchar } from "drizzle-orm/
 export const typeEnum = pgEnum("type", ["text", "relation", "tag"]);
 
 // Each property has a descriptor containing its type, name, and some optional properties
-export const descriptors = pgTable("descriptors", {
+export const properties = pgTable("properties", {
     id: serial("id").primaryKey(),
     type: typeEnum("type").default("text").notNull(),
     name: varchar("name").notNull(),
@@ -19,9 +19,9 @@ export const tasks = pgTable("tasks", {
 // Allowed values for tags
 export const tags = pgTable("tags", {
     id: serial("id").primaryKey(),
-    descriptorId: integer("descriptorId")
+    propertyId: integer("propertyId")
         .notNull()
-        .references(() => descriptors.id),
+        .references(() => properties.id),
     label: varchar("name").notNull(),
     color: varchar("color", { length: 7 }).default("#333333").notNull(), // hex
 });
@@ -32,9 +32,9 @@ export const values = pgTable("values", {
     taskId: integer("taskId")
         .notNull()
         .references(() => tasks.id),
-    descriptorId: integer("descriptorId")
+    propertyId: integer("propertyId")
         .notNull()
-        .references(() => descriptors.id),
+        .references(() => properties.id),
     text: varchar("text"), // text
     relation: integer("relation").references(() => tasks.id), // reference
     tag: integer("tag").references(() => tags.id), // tag
@@ -43,13 +43,13 @@ export const values = pgTable("values", {
 // Board data - we need to know which property to use for name, children, and parents
 export const boards = pgTable("boards", {
     id: serial("id").primaryKey(),
-    nameDescriptorId: integer("nameDescriptorId")
+    namePropertyId: integer("namePropertyId")
         .notNull()
-        .references(() => descriptors.id),
-    childrenDescriptorId: integer("childrenDescriptorId")
+        .references(() => properties.id),
+    childrenPropertyId: integer("childrenPropertyId")
         .notNull()
-        .references(() => descriptors.id),
-    parentsDescriptorId: integer("parentsDescriptorId")
+        .references(() => properties.id),
+    parentsPropertyId: integer("parentsPropertyId")
         .notNull()
-        .references(() => descriptors.id),
+        .references(() => properties.id),
 });

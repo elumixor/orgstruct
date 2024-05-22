@@ -1,6 +1,6 @@
 import { Component, computed, effect, inject, output } from "@angular/core";
 import { TasksService } from "@services/tasks.service";
-import type { IPropertyDescriptor } from "@shared";
+import type { Property } from "@shared";
 import { ComponentsModule } from "../components";
 import { signalSet } from "../utils";
 
@@ -14,8 +14,8 @@ import { signalSet } from "../utils";
 export class PropertyManagerComponent {
     private readonly tasksService = inject(TasksService);
     readonly properties = computed(() => this.tasksService.properties().values().toArray());
-    readonly hidden = signalSet<IPropertyDescriptor>();
-    readonly updated = output<IPropertyDescriptor[]>();
+    readonly hidden = signalSet<Property>();
+    readonly updated = output<Property[]>();
 
     constructor() {
         effect(() => {

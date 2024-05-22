@@ -1,16 +1,16 @@
 import { Injectable, computed, inject, signal } from "@angular/core";
 import {
     Filter,
+    Property,
     Task,
     type IBoardData,
-    type IPropertyDescriptor,
-    type IPropertyType,
-    type IPropertyValue,
     type ITag,
     type PropertyMap,
+    type PropertyType,
+    type PropertyValue,
 } from "@domain";
 import { all, nonNull } from "@elumixor/frontils";
-import { signalArray, signalMap } from "../utils";
+import { schedule, signalArray, signalMap } from "../utils";
 import { NetworkService } from "./network.service";
 
 /**
@@ -20,78 +20,42 @@ import { NetworkService } from "./network.service";
     providedIn: "root",
 })
 export class TasksService {
-    readonly propertyTypes = [
-        "text",
-        "relation",
-        "tag",
-        // "moment",
-        // "interval"
-    ] satisfies IPropertyType[];
-    readonly propertyIcons = new Map([
-        ["text", "pi pi-align-left"],
-        ["relation", "pi pi-link"],
-        ["tag", "pi pi-tag"],
+    readonly propertyIcons: Record<PropertyType, string> = {
+        text: "pi pi-align-left",
+        relation: "pi pi-link",
+        tag: "pi pi-tag",
         // ["moment", "pi pi-calendar"],
         // ["interval", "pi pi-clock"],
-    ]) satisfies Map<IPropertyType, string>;
+    };
+
     private readonly network = inject(NetworkService);
 
     private readonly boardData = signal<IBoardData | undefined>(undefined);
-    readonly properties = signalMap<number, IPropertyDescriptor>();
+    readonly properties = signalMap<number, Property>();
     readonly tasks = signalArray<Task>();
 
     // Special properties
     readonly nameProperty = computed(() => {
-        const namePropertyId = this.boardData()?.nameDescriptorId;
+        const namePropertyId = this.boardData()?.namePropertyId;
         if (!namePropertyId) return undefined;
-        return this.properties.get(namePropertyId) as IPropertyDescriptor<"text">;
+        return this.properties.get(namePropertyId) as Property<"text">;
     });
     readonly childrenProperty = computed(() => {
-        const childrenPropertyId = this.boardData()?.childrenDescriptorId;
+        const childrenPropertyId = this.boardData()?.childrenPropertyId;
         if (!childrenPropertyId) return undefined;
-        return (this.properties.get(childrenPropertyId) ?? []) as IPropertyDescriptor<"relation">;
+        return (this.properties.get(childrenPropertyId) ?? []) as Property<"relation">;
     });
     readonly parentsProperty = computed(() => {
-        const parentsPropertyId = this.boardData()?.parentsDescriptorId;
+        const parentsPropertyId = this.boardData()?.parentsPropertyId;
         if (!parentsPropertyId) return undefined;
-        return (this.properties.get(parentsPropertyId) ?? []) as IPropertyDescriptor<"relation">;
-    });
-
-    // Tasks, organized in a tree structure
-    private readonly openMap = new Map<string, boolean>(); // we need to keep track of which tree element is open and preserve it during updates
-    readonly taskTree = computed(() => {
-        // Start with the top level tasks
-        const tasks = this.tasks().filter((task) => task.parents.isEmpty);
-
-        // Alias to keep the "this" context
-        const openMap = this.openMap;
-
-        const processTask = (task: Task, parent?: Task): IProcessedTask => {
-            const id = `${task.id}:${parent?.id ?? ""}`;
-
-            return {
-                data: task,
-                get open() {
-                    return openMap.get(id) ?? false;
-                },
-                set open(value) {
-                    openMap.set(id, value);
-                },
-                children: task.children.map((child) => processTask(child, task)),
-            };
-        };
-
-        return tasks
-            .values()
-            .map((task) => processTask(task))
-            .toArray();
+        return (this.properties.get(parentsPropertyId) ?? []) as Property<"relation">;
     });
 
     private async initialize() {
         // Get initial data from the server
-        const [tasks, descriptorsRaw, boardData] = await all(
+        const [tasks, propertiesRaw, boardData] = await all(
             this.network.getTasks(),
-            this.network.getDescriptors(),
+            this.network.getProperties(),
             this.network.getBoardData(),
         );
 
@@ -99,7 +63,13 @@ export class TasksService {
         this.boardData.set(boardData);
 
         // Fill the property descriptor map
-        this.properties.set(new Map(descriptorsRaw.map((d) => [d.id, { ...d, icon: this.propertyIcons.get(d.type) }])));
+        const properties = new Map(
+            propertiesRaw.map(({ id, name, type, parameters }) => [
+                id,
+                new Property({ id, name, type, parameters, icon: this.propertyIcons[type] }),
+            ]),
+        );
+        this.properties.set(properties);
 
         const nameProperty = this.nameProperty()!;
         const childrenProperty = this.childrenProperty()!;
@@ -111,39 +81,33 @@ export class TasksService {
                 const values = new Map(
                     this.properties()
                         .entries()
-                        .map(([key, descriptor]) => [descriptor, properties[key]]),
+                        .map(([key, descriptor]) => [descriptor, signal(properties[key])]),
                 ) as PropertyMap;
 
                 return [id, new Task(id, values, nameProperty, childrenProperty, parentsProperty)];
             }),
         );
 
-        // For all tasks, change relations from id to Task (revive)
+        // For all tasks, change relations from id to Task
         // Also, replace tag indices with actual values
-        const tags = this.properties()
+        const tagProperties = this.properties()
             .values()
-            .filter((d) => d.type === "tag")
-            .map((d) => {
-                const descriptor = d as IPropertyDescriptor<"tag">;
-                const valueMap = new Map<number, ITag>(
-                    Object.entries(descriptor.parameters!.values).map(([k, v]) => [Number(k), v]),
-                );
-                (d as IPropertyDescriptor<"tag">).parameters!.values = valueMap;
-
-                return d;
-            })
-            .toArray() as IPropertyDescriptor<"tag">[];
+            .filter((d) => d.type() === "tag")
+            .toArray() as Property<"tag">[];
 
         for (const task of processedTasks.values()) {
-            task.children = task.children.map((id) => nonNull(processedTasks.get(id as unknown as number)));
-            task.parents = task.parents.map((id) => nonNull(processedTasks.get(id as unknown as number)));
+            // Replace children ids with actual objects id -> Task
+            task.children.update((children) =>
+                children.map((id) => nonNull(processedTasks.get(id as unknown as number))),
+            );
+            // same for the parents
+            task.parents.update((parents) => parents.map((id) => nonNull(processedTasks.get(id as unknown as number))));
 
-            for (const tagProperty of tags) {
-                task.properties.set(
-                    tagProperty,
-                    (task.properties.get(tagProperty) as unknown as number[]).map(
-                        (i) => tagProperty.parameters!.values.get(i)!,
-                    ),
+            // For each tag property available, replace all tag values with id -> ITag
+            for (const tagProperty of tagProperties) {
+                const selectedTags = task.properties.get(tagProperty);
+                selectedTags.update((ids) =>
+                    ids.map((id) => nonNull(tagProperty.parameters()).values[id as unknown as number]),
                 );
             }
         }
@@ -159,54 +123,81 @@ export class TasksService {
         const defaultProperties = new Map(
             this.properties()
                 .values()
-                .map((descriptor) => [descriptor, this.defaultValue(descriptor.type)]),
+                .map((descriptor) => [descriptor, signal(this.defaultValue(descriptor.type()))]),
         ) as PropertyMap;
 
-        const task = new Task(
-            Date.now(),
-            defaultProperties,
-            this.nameProperty()!,
-            this.childrenProperty()!,
-            this.parentsProperty()!,
-        );
+        const name = nonNull(this.nameProperty());
+        const children = nonNull(this.childrenProperty());
+        const parents = nonNull(this.parentsProperty());
 
-        void this.network.addTask().then(({ id }) => (task.id = id));
+        const task = new Task(Date.now(), defaultProperties, name, children, parents);
 
-        parent?.children.push(task);
+        parent?.children.update((tasks) => [...tasks, task]);
+
+        void this.network
+            .addTask()
+            .then(({ id }) => task.id.set(id))
+            .then(() => {
+                if (parent) this.updateTask(parent, children);
+            });
+
         this.tasks.push(task);
     }
 
-    // todo: side-effect
+    updateTask(task: Task, property: Property) {
+        const tid = task.id();
+        const pid = property.id();
+        const id = `${tid}:${pid}`;
+
+        schedule({
+            fn: () => void this.network.updateTask({ tasks: [task.serialized()] }),
+            id,
+        });
+    }
+
+    deleteTask(task: Task) {
+        this.tasks.remove(task);
+        void this.network.deleteTask({ id: task.id() });
+    }
+
     addProperty() {
-        const propertyDescriptor = {
+        const property = new Property({
             id: Date.now(),
             name: "Text property",
-            type: "text",
-        } satisfies IPropertyDescriptor<"text">;
-
-        for (const task of this.tasks())
-            task.properties.set(propertyDescriptor, this.defaultValue(propertyDescriptor.type));
-
-        this.properties.setValue(propertyDescriptor.id, propertyDescriptor);
-        this.tasks.update((t) => [...t]);
-    }
-
-    // todo: side-effect
-    deleteProperty(descriptor: IPropertyDescriptor) {
-        for (const task of this.tasks()) task.properties.delete(descriptor);
-
-        this.properties.delete(descriptor.id);
-        this.tasks.update((t) => [...t]);
-    }
-
-    // todo: side-effect
-    removeTag(descriptor: IPropertyDescriptor<"tag">, tag: ITag) {
-        descriptor.parameters!.values.delete(tag.id);
-
-        this.tasks.update((tasks) => {
-            for (const task of tasks) task.properties.get(descriptor).remove(tag);
-            return tasks;
+            type: "text" as const,
+            parameters: undefined,
+            icon: this.propertyIcons.text,
         });
+
+        for (const task of this.tasks()) task.properties.set(property, signal(this.defaultValue(property.type())));
+
+        this.properties.setValue(property.id(), property);
+
+        void this.network.addProperty(property.serialized()).then(({ id }) => {
+            this.properties.delete(property.id());
+            property.id.set(id);
+            this.properties.setValue(id, property);
+        });
+    }
+    updateProperty(descriptor: Property) {
+        const id = descriptor.id();
+        const values = {
+            name: descriptor.name(),
+            type: descriptor.type(),
+            parameters: descriptor.parameters(),
+            icon: descriptor.icon(),
+        };
+
+        schedule({
+            fn: () => void this.network.updateProperty({ id, ...values }),
+            id: `property:${id}`,
+        });
+    }
+
+    deleteProperty(descriptor: Property) {
+        for (const task of this.tasks()) task.properties.delete(descriptor);
+        this.properties.delete(descriptor.id());
+        void this.network.deleteProperty({ id: descriptor.id() });
     }
 
     defaultFilter() {
@@ -214,14 +205,14 @@ export class TasksService {
         return new Filter("New Filter", property, [], "is");
     }
 
-    private defaultValue<T extends IPropertyType>(propertyType: T): IPropertyValue<T> {
+    private defaultValue<T extends PropertyType>(propertyType: T): PropertyValue<T> {
         switch (propertyType) {
             case "text":
-                return "";
+                return "" as PropertyValue<T>;
             case "relation":
-                return [];
+                return [] as Task[] as PropertyValue<T>;
             case "tag":
-                return [];
+                return [] as ITag[] as PropertyValue<T>;
             // case "moment":
             //     return new Date();
             // case "interval":
@@ -233,10 +224,4 @@ export class TasksService {
                 throw new Error(`Unknown property type: ${propertyType}`);
         }
     }
-}
-
-export interface IProcessedTask {
-    data: Task;
-    open: boolean;
-    children: IProcessedTask[];
 }
